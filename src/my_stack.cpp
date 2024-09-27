@@ -4,21 +4,47 @@
 #include <stdlib.h>
 #include <assert.h>
 
+
+const char* err_stats[] = {
+    "OK",
+    "SIZE_ERROR",
+    "ALLOC_ERROR",
+    "HASH_ERROR",
+    "PTR_ERROR",
+    "STACK_CANARY_DIED",
+    "DATA_CANARY_DIED"
+};
+
+
 stack_err stack_init(stack_t* stack, size_t init_capacity)
 {
     assert(stack);
 
-    stack -> data = (stack_elem_t*)calloc(init_capacity, sizeof(stack_elem_t));
-    if (stack -> data == NULL)
+    DEBUG_PRINTF("INIT STACK\n");
+    char* ptr = (char*)calloc(init_capacity * sizeof(stack_elem_t) + 2 * sizeof(uint64_t), sizeof(char));
+    if (ptr == NULL)
     {
         stack -> err_stat = ALLOC_ERROR;
         return ALLOC_ERROR;
     }
+    stack -> left_canary  = (uint64_t)stack ^ canary_const;
+    stack -> right_canary = (uint64_t)stack ^ canary_const;
+
+
+
+    stack -> data = (stack_elem_t*)(ptr + sizeof(uint64_t));
+    *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)) = (uint64_t)ptr ^ canary_const;
+    *(uint64_t*)(stack -> data + stack -> capacity) = (uint64_t)ptr ^ canary_const;
+    DEBUG_PRINTF("data canary [%x]\n", *(uint64_t*)ptr);
+    DEBUG_PRINTF("ptr[%p] data[%p]\n", ptr, stack -> data);
+
     stack -> capacity = init_capacity;
     stack -> size = 0;
 
+    STACK_DUMP(stack, __func__);
+    CHECK_STACK(stack);
+
     DEBUG_PRINTF("Stack Initialised Succesfully\n");
-    //stack_verify(stack);
     return stack -> err_stat;
 }
 
@@ -41,59 +67,106 @@ stack_err stack_delete(stack_t* stack)
     return stack -> err_stat;
 }
 
-stack_err stack_dump(stack_t* stack)
+stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, const char* call_func)
 {
     assert(stack);
 
-    //stack_verify();
-    printf("\n--- STACK_INFO ---\n"
-           "size:     [%d]\n"
-           "capacity: [%d]\n"
-           "err_stat: ", stack -> size, stack -> capacity);
-
-    switch (stack -> err_stat)
+    if (stack == NULL)
     {
-        case OK: printf("OK\n");
-                 break;
-        case ALLOC_ERROR: printf("ALLOC_ERROR\n");
-                          break;
-        case SIZE_ERROR:  printf("SIZE_ERROR\n");
-                          break;
-        case HASH_ERROR:  printf("HASH_ERROR\n");
-                          break;
-        default: printf("???default???\n");
-                 break;
+        fprintf_red(stderr, "ERROR: INVALID POINTER(NULL) stack, cannot print info about stack\n");
+        return PTR_ERROR;
     }
+    fprintf_red(stdout,
+        "\nstack[%p] created in %s:%d\n"
+        "name [%s], called from %s:%d (%s)\n"
+        "left canary  [%x]\n"
+        "right canary [%x]\n"
+        "size:        [%x]\n"
+        "capacity:    [%x]\n"
+        "err_stat:    [%s]\n",
+        stack, stack -> file, stack -> line,
+        stack -> name, call_file, call_line, call_func,
+        stack -> left_canary, stack -> right_canary,
+        stack -> size, stack -> capacity, err_stats[stack -> err_stat]);
 
-    printf("stack data:\n");
+    printf_green("stack data[%p]:\n"
+                "{\n", stack -> data);
+    if (stack -> data == NULL)
+    {
+        fprintf_red(stderr, "ERROR: INVALID POINTER(NULL) stack -> data, cannot print info about stack -> data\n");
+        return PTR_ERROR;
+    }
+    printf_green("left  canary [%x]\n", *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)));
+    printf_green("right canary [%x]\n", *(uint64_t*)(stack -> data + stack -> capacity));
     for (size_t i = 0; i < stack -> capacity; i++)
-        printf("%3d:[%d]\n", i, stack -> data[i]);
-    printf("\n");
+        printf_green("%4d:[%10d][%x]\n", i, stack -> data[i], stack -> data[i]);
+    printf_green("}\n");
+
     return stack -> err_stat;
 }
 
 stack_err stack_verify(stack_t* stack)
 {
     assert(stack);
-    if (stack == NULL || stack -> err_stat != OK || stack -> data == NULL)
+
+    if (stack == NULL || stack -> data == NULL)
     {
-        fprintf(stderr, "VERIFICATION FAILED\n");
-        return VERIF_ERROR;
+        fprintf_red(stderr, "VERIFICATION FAILED\n");
+        return PTR_ERROR;
     }
     if (stack -> size > stack -> capacity)
     {
-        fprintf(stderr, "VERIFICATION FAILED: size > capacity\n");
+        fprintf_red(stderr, "VERIFICATION FAILED: size > capacity\n");
+        stack -> err_stat = SIZE_ERROR;
         return SIZE_ERROR;
+    }
+    uint64_t canary_value = (uint64_t)stack ^ canary_const;
+    if (memcmp(&stack -> left_canary, &canary_value, sizeof(uint64_t)) != 0)
+    {
+        fprintf_red(stderr, "STACK LEFT CANARY DIED([%x] != [%x])\n", stack -> left_canary, canary_value);
+        stack -> err_stat = STACK_CANARY_DIED;
+        return STACK_CANARY_DIED;
+    }
+
+    if (memcmp(&stack -> right_canary, &canary_value, sizeof(uint64_t)) != 0)
+    {
+        fprintf_red(stderr, "STACK RIGHT CANARY DIED([%x] != [%x])\n", stack -> right_canary, (uint64_t)stack ^ canary_const);
+        stack -> err_stat = STACK_CANARY_DIED;
+        return STACK_CANARY_DIED;
+    }
+
+    uint64_t data_canary_value = *(uint64_t*)((char*)stack -> data - sizeof(uint64_t));
+    if (memcmp((uint64_t*)((char*)stack -> data - sizeof(uint64_t)), &data_canary_value, sizeof(uint64_t)) != 0)
+    {
+        fprintf_red(stderr, "DATA LEFT CANARY DIED([%x] != [%x])\n", *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)), data_canary_value);
+        stack -> err_stat = DATA_CANARY_DIED;
+        return DATA_CANARY_DIED;
+    }
+
+    if (memcmp((uint64_t*)(stack -> data + stack -> capacity), &data_canary_value, sizeof(uint64_t) != 0))
+    {
+        fprintf_red(stderr, "DATA RIGHT CANARY DIED([%x] != [%x])\n", *(uint64_t*)(stack -> data + stack -> capacity), data_canary_value);
+        stack -> err_stat = DATA_CANARY_DIED;
+        return DATA_CANARY_DIED;
     }
 
     return stack -> err_stat;
+}
+
+inline void stack_check(stack_t* stack, const char* file_name, size_t line, const char* func)
+{
+    if (stack_verify(stack) != OK)
+    {
+        STACK_DUMP(stack, func);
+        assert(0);
+    }
 }
 
 stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
 {
     assert(stack);
 
-    stack_verify(stack);
+    CHECK_STACK(stack);
 
     size_t new_capacity = 0;
     switch(state)
@@ -105,28 +178,33 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
         default: break;
     }
 
-    stack_elem_t* ptr = (stack_elem_t*)calloc(new_capacity, sizeof(stack_elem_t));
+    char* ptr = (char*)calloc(new_capacity * sizeof(stack_elem_t) + 2 * sizeof(uint64_t), sizeof(char));
     if (ptr == NULL)
     {
-        fprintf(stderr, "Cannot reallocate memory for stack\n");
+        fprintf_red(stderr, "Cannot reallocate memory for stack\n");
         return ALLOC_ERROR;
     }
     else
     {
-        DEBUG_PRINTF("ptr start:    %p\n"
+        DEBUG_PRINTF_CYAN("ptr start:    %p\n"
                      "ptr new area: %p\n"
                      "stack cap:    %d\n"
                      "new cap:      %d\n"
                      "count for memset - [%d]\n",
-                     ptr, ptr + stack -> capacity, stack -> capacity, new_capacity,
+                     ptr, ptr + sizeof(stack_elem_t) * stack -> capacity, stack -> capacity, new_capacity,
                      (new_capacity - stack -> capacity) * sizeof(stack_elem_t));
         memcpy(ptr, stack -> data, stack -> capacity * sizeof(stack_elem_t));
         free(stack -> data);
         //memset(ptr + stack -> capacity, 0, (new_capacity - stack -> capacity) * sizeof(stack_elem_t));
-        stack -> data = ptr;
+
+        stack -> data  = (stack_elem_t*)(ptr + sizeof(uint64_t));
         stack -> capacity = new_capacity;
+
+        *(uint64_t*)ptr                 = (uint64_t)stack -> data ^ canary_const;
+        *(stack -> data + new_capacity) = (uint64_t)stack -> data ^ canary_const;
+        free(ptr);
     }
-    stack_dump(stack);
+    STACK_DUMP(stack, __func__);
     DEBUG_PRINTF("Reallocation completed\n");
     return stack -> err_stat;
 }
@@ -135,7 +213,8 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
 {
     assert(stack);
 
-    stack_verify(stack);
+    DEBUG_PRINTF("PUSH START\n");
+    CHECK_STACK(stack);
     if (stack -> capacity <= stack -> size)
     {
         DEBUG_PRINTF("Reallocation call\n"
@@ -146,13 +225,13 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
 
     if (stack_verify(stack) != OK)
     {
-        fprintf(stderr, "STACK PUSH FAILED\n");
+        fprintf_red(stderr, "STACK PUSH FAILED\n");
         return stack -> err_stat;
     }
 
     stack -> data[stack -> size] = elem;
     (stack -> size)++;
-    stack_dump(stack);
+    STACK_DUMP(stack, __func__);
 
     DEBUG_PRINTF("Stack_push Executed\n");
     return stack -> err_stat;
@@ -161,7 +240,7 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
 stack_err stack_pop(stack_t* stack)
 {
     assert(stack);
-    stack_verify(stack);
+    CHECK_STACK(stack);
     if (stack -> size > 0)
     {
         *(stack -> data + stack -> size) = 0;

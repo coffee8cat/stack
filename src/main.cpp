@@ -1,14 +1,15 @@
 #include "my_stack.h"
+#include <TXLib.h>
 
 int main()
 {
-    stack_t stack = {};
-    stack_init(&stack, 2);
-    stack_dump(&stack);
+    stack_t stack = {INIT(stack)};
+    stack_init(&stack, 4);
+    STACK_DUMP(&stack, __func__);
     for (size_t i = 0; i < 18; i++)
         stack_push(&stack, i);
     //stack_pop(&stack);
-    stack_dump(&stack);
+    STACK_DUMP(&stack, __func__);
 
     stack_delete(&stack);
     return 0;
