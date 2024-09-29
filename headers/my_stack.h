@@ -6,10 +6,12 @@
 #include <stdint.h>
 #include <assert.h>
 
+#include "stack_config.h"
+
 #ifdef DEBUG
 
 #define DEBUG_PRINTF(...) printf(__VA_ARGS__);
-#define DEBUG_PRINTF_CYAN(str, ...) printf_cyan(str, #__VA_ARGS__);
+#define DEBUG_PRINTF_CYAN(str, ...) printf_cyan(str, __VA_ARGS__);
 
 #else
 
@@ -27,8 +29,8 @@
 #define ANSI_COLOR_RESET "\x1b[0m"
 
 #define printf_red(str, ...)   printf(ANSI_COLOR_RED   str ANSI_COLOR_RESET, __VA_ARGS__);
-#define printf_green(str, ...) printf(ANSI_COLOR_GREEN str ANSI_COLOR_RESET, ##__VA_ARGS__);
-#define printf_cyan(str,...)   printf(ANSI_COLOR_CYAN   str ANSI_COLOR_RESET, ##__VA_ARGS__);
+#define printf_green(str, ...) printf(ANSI_COLOR_GREEN str ANSI_COLOR_RESET, __VA_ARGS__);
+#define printf_cyan(str,...)   printf(ANSI_COLOR_CYAN   str ANSI_COLOR_RESET, __VA_ARGS__);
 
 #define fprintf_red(file,str,...)   fprintf(file, ANSI_COLOR_RED   str ANSI_COLOR_RESET, ##__VA_ARGS__);
 #define fprintf_green(file,str,...) fprintf(file, ANSI_COLOR_GREEN str ANSI_COLOR_RESET, ##__VA_ARGS__);
