@@ -1,7 +1,7 @@
 #ifndef _STACK_CONFIGURATION_FILE_H__
 #define _STACK_CONFIGURATION_FILE_H__
 
-//#define CANARY_PROTECT
+#define CANARY_PROTECT
 #define HASH_PROTECT
 
 #endif

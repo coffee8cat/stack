@@ -4,9 +4,9 @@
 int main()
 {
     stack_t stack = {INIT(stack)};
-    stack_init(&stack, 15);
+    stack_init(&stack, 2);
     STACK_DUMP(&stack, __func__);
-    for (size_t i = 0; i < 124; i++)
+    for (size_t i = 0; i < 4; i++)
         stack_push(&stack, i);
     //stack_pop(&stack);
     STACK_DUMP(&stack, __func__);

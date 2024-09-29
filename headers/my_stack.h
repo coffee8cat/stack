@@ -8,10 +8,11 @@
 
 #include "stack_config.h"
 
+#define DEBUG
 #ifdef DEBUG
 
-#define DEBUG_PRINTF(...) printf(__VA_ARGS__);
-#define DEBUG_PRINTF_CYAN(str, ...) printf_cyan(str, __VA_ARGS__);
+#define DEBUG_PRINTF(...) printf(__VA_ARGS__)
+#define DEBUG_PRINTF_CYAN(str, ...) printf_cyan(str, __VA_ARGS__)
 
 #else
 
@@ -37,6 +38,7 @@
 
 enum stack_realloc_state {INCREASE, DECREASE};
 const double realloc_coeff = 2;
+const uint64_t hash_coeff = 1;
 
 enum stack_err {
     OK,
@@ -56,14 +58,16 @@ struct stack_t {
     const char* file;
     size_t line;
     stack_elem_t* data;
+    uint64_t data_hash_sum;
     size_t size;
     size_t capacity;
     stack_err err_stat;
-    int hash_sum;
+    uint64_t stack_hash_sum;
     uint64_t right_canary;
 };
 
 #define STACK_DUMP(stack, func) stack_dump(stack, __FILE__, __LINE__, func)
+#define CHECK_STACK(stack) stack_check(stack, __FILE__, __LINE__, __func__)
 
 stack_err stack_init   (stack_t* stack, size_t init_size);
 stack_err stack_delete (stack_t* stack);
@@ -72,13 +76,12 @@ stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, co
 stack_err stack_verify(stack_t* stack);
 inline void stack_check(stack_t* stack, const char* file_name, size_t line, const char* func);
 
+//uint64_t DJB_hash(char* start, char* end);
+uint64_t calc_hash(char* start, char* end);
+
 stack_err stack_realloc(stack_t* stack, stack_realloc_state state);
 
 stack_err stack_push(stack_t* stack, stack_elem_t elem);
 stack_err stack_pop (stack_t* stack);
 
-#ifndef CHECK_STACK
-#define CHECK_STACK(stack) stack_check(stack, __FILE__, __LINE__, __func__);
-
-#endif
 #endif //_STACK_HEADER_H__
