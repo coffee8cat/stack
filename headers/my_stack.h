@@ -29,15 +29,19 @@
 #define ANSI_COLOR_CYAN  "\e[46m"
 #define ANSI_COLOR_RESET "\x1b[0m"
 
-#define printf_red(str, ...)   printf(ANSI_COLOR_RED   str ANSI_COLOR_RESET, __VA_ARGS__);
-#define printf_green(str, ...) printf(ANSI_COLOR_GREEN str ANSI_COLOR_RESET, __VA_ARGS__);
-#define printf_cyan(str,...)   printf(ANSI_COLOR_CYAN   str ANSI_COLOR_RESET, __VA_ARGS__);
+#define printf_red(str, ...)   printf(ANSI_COLOR_RED   str ANSI_COLOR_RESET, #__VA_ARGS__);
+#define printf_green(str, ...) printf(ANSI_COLOR_GREEN str ANSI_COLOR_RESET, #__VA_ARGS__);
+#define printf_cyan(str,...)   printf(ANSI_COLOR_CYAN   str ANSI_COLOR_RESET, #__VA_ARGS__);
 
 #define fprintf_red(file,str,...)   fprintf(file, ANSI_COLOR_RED   str ANSI_COLOR_RESET, ##__VA_ARGS__);
 #define fprintf_green(file,str,...) fprintf(file, ANSI_COLOR_GREEN str ANSI_COLOR_RESET, ##__VA_ARGS__);
-
+/*
+const char* log_file_name = "log_stack.txt";
+FILE* log_thread = fopen(log_file_name, "w");
+#define LOG_DUMP(...) fprintf(log_thread, ##__VA_ARGS__)
+*/
 enum stack_realloc_state {INCREASE, DECREASE};
-const double realloc_coeff = 2;
+const size_t realloc_coeff = 2;
 const uint64_t hash_coeff = 1;
 
 enum stack_err {
@@ -57,11 +61,11 @@ struct stack_t {
     const char* name;
     const char* file;
     size_t line;
-    stack_elem_t* data;
-    uint64_t data_hash_sum;
     size_t size;
     size_t capacity;
     stack_err err_stat;
+    stack_elem_t* data;
+    uint64_t data_hash_sum;
     uint64_t stack_hash_sum;
     uint64_t right_canary;
 };
