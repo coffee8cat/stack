@@ -20,22 +20,30 @@ stack_err stack_init(stack_t* stack, size_t init_capacity)
 {
     assert(stack);
 
+    //clear memory
     memset(stack, 0, ((char*)&stack -> right_canary - (char*)stack));
+
     stack -> capacity = init_capacity;
     stack -> size = 0;
 
     PRINTF_MAGENTA("INIT STACK\n");
+    //check if stack is empty
     if (init_capacity > 0)
     {
+        //allocate memory for data
         char* ptr = (char*)calloc(init_capacity * sizeof(stack_elem_t) + 2 * sizeof(uint64_t), sizeof(char));
+        //check allocated memory
         if (ptr == NULL)
         {
+            //return error in case of failure
             stack -> err_stat = ALLOC_ERROR;
             return ALLOC_ERROR;
         }
 
+        //init data pointer
         stack -> data = (stack_elem_t*)(ptr + sizeof(uint64_t));
-        //data canaries
+
+        //init data canaries
         #ifdef CANARY_PROTECT
             *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)) =  canary_const;
             *(uint64_t*)(stack -> data + stack -> capacity)       =  canary_const;
@@ -50,11 +58,13 @@ stack_err stack_init(stack_t* stack, size_t init_capacity)
         stack -> data = NULL;
     }
 
+    //init canary protection
     #ifdef CANARY_PROTECT
         stack -> left_canary  =  canary_const;
         stack -> right_canary =  canary_const;
     #endif
 
+    //init hash protection
     #ifdef HASH_PROTECT
     //hash must not include itself in calculation
     stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
@@ -70,6 +80,8 @@ stack_err stack_delete(stack_t* stack)
 {
     assert(stack);
 
+    //check if stack pointer is valid
+    //return error if not
     if (stack == NULL)
     {
         FPRINTF_RED(stderr, "ERROR: INVALID POINTER(NULL) given to stack_delete\n");
@@ -78,17 +90,11 @@ stack_err stack_delete(stack_t* stack)
 
     PRINTF_MAGENTA("Deleting stack\n"
                    "stack size = [%ld]\n",
-                   (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t) + sizeof(uint64_t));
+                   (size_t)(&stack -> right_canary - &stack -> left_canary) + sizeof(uint64_t));
+    //clear memory and free allocated memory
     memset(stack, 0, (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t) + sizeof(uint64_t));
     free(stack -> data);
-/*
-    stack -> data = NULL;
-    stack -> size = 0;
-    stack -> capacity = 0;
-    stack -> err_stat = OK;
-    stack -> stack_hash_sum = 0;
-    stack -> data_hash_sum  = 0;
-*/
+
     return stack -> err_stat;
 }
 
@@ -282,6 +288,8 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
         stack_init(stack, 4);
         return stack -> err_stat;
     }
+
+    //calculating new capacity
     size_t new_capacity = 0;
     switch(state)
     {
@@ -292,8 +300,10 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
         default: break;
     }
 
+    //Starting reallocation
     PRINTF_YELLOW("ptr to reallocate [%p]\n", (char*)stack -> data - sizeof(uint64_t));
     char* ptr = (char*)realloc((char*)stack -> data - sizeof(uint64_t), new_capacity * sizeof(stack_elem_t) + 2 * sizeof(uint64_t));
+    //checking reallocated pointer
     if (ptr == NULL)
     {
         FPRINTF_RED(stderr, "Cannot reallocate memory for stack\n");
@@ -303,6 +313,7 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
     }
     else
     {
+        //print info about reallocation
         PRINTF_YELLOW("ptr start:    %p\n", ptr);
         PRINTF_YELLOW("data start:   %p\n", ptr + sizeof(uint64_t));
         PRINTF_YELLOW("ptr new area: %p\n", ptr + sizeof(uint64_t) + sizeof(stack_elem_t) * stack -> capacity);
@@ -310,12 +321,15 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
         PRINTF_YELLOW("new cap:      %ld\n", new_capacity);
         PRINTF_YELLOW("offset - [%ld]\n",   (new_capacity - stack -> capacity) * sizeof(stack_elem_t) + sizeof(uint64_t));
 
+        //clear added memory in case of increasing
         if (state == INCREASE)
             memset(ptr + sizeof(uint64_t) + stack -> capacity * sizeof(stack_elem_t), 0, (new_capacity - stack -> capacity) * sizeof(stack_elem_t));
 
+        //updating data pointer and capacity
         stack -> data  = (stack_elem_t*)(ptr + sizeof(uint64_t));
         stack -> capacity = new_capacity;
 
+        //updating canary protection
         #ifdef CANARY_PROTECT
             stack -> data[-1]           =  canary_const;
             stack -> data[new_capacity] =  canary_const;
@@ -323,9 +337,10 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
             PRINTF_YELLOW("data right canary [%llx] at (%p)\n", stack -> data[new_capacity], &stack -> data[new_capacity]);
         #endif
     }
+    //updating hash
     #ifdef HASH_PROTECT
-    //hash must not include itself in calculation
-    stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
+        //hash must not include itself in calculation
+        stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
     STACK_DUMP(stack, __func__);
@@ -341,32 +356,39 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
 
     PRINTF_RED("-----PUSH START-----\n");
     CHECK_STACK(stack);
+
+    //check if there is enough memory for element
+    //start reallocation if stack is full
     if (stack -> capacity <= stack -> size)
     {
         DEBUG_PRINTF("Reallocation call\n"
                      "size:     %d\n"
                      "capacity: %d\n", stack -> size, stack -> capacity);
         stack_realloc(stack, INCREASE);
+
+        //update hash
+        #ifdef HASH_PROTECT
+            //hash must not include itself in calculation
+            stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
+        #endif
+
+        CHECK_STACK(stack);
     }
 
-    #ifdef HASH_PROTECT
-        //hash must not include itself in calculation
-        stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
-    #endif
-
-    CHECK_STACK(stack);
-
+    //actually push element
     stack -> data[stack -> size] = elem;
     (stack -> size)++;
-    STACK_DUMP(stack, __func__);
 
+    //update hash
     #ifdef HASH_PROTECT
         //hash must not include itself in calculation
         stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
-    CHECK_STACK(stack);
+    STACK_DUMP(stack, __func__);
     PRINTF_RED("-----STACK PUSH END-----\n");
+    CHECK_STACK(stack);
+
     return stack -> err_stat;
 }
 
@@ -375,22 +397,28 @@ stack_err stack_pop(stack_t* stack)
     assert(stack);
     PRINTF_RED("-----STACK POP-----\n");
     CHECK_STACK(stack);
+
+    //check if stack is empty
     if (stack -> size > 0)
     {
+        //remove element
         *(stack -> data + stack -> size - 1) = 0;
         stack -> size--;
     }
     else
     {
+        //stack is empty, return error
         stack -> err_stat = SIZE_ERROR;
         return SIZE_ERROR;
     }
 
+    //update hash
     #ifdef HASH_PROTECT
         //hash must not include itself in calculation
         stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
+    //check if reallocation needed
     printf("size           = %ld\n", stack -> size);
     printf("capacity       = %ld\n", stack -> capacity);
     printf("realloc border = %ld\n", stack -> capacity / (realloc_coeff * realloc_coeff));
@@ -399,11 +427,6 @@ stack_err stack_pop(stack_t* stack)
         PRINTF_RED("REALLOC CALLED FROM stack_pop\n");
         stack_realloc(stack, DECREASE);
     }
-
-    #ifdef HASH_PROTECT
-        //hash must not include itself in calculation
-        stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
-    #endif
 
     CHECK_STACK(stack);
     STACK_DUMP(stack, __func__);
