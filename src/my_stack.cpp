@@ -25,23 +25,26 @@ stack_err stack_init(stack_t* stack, size_t init_capacity)
     stack -> size = 0;
 
     DEBUG_PRINTF("INIT STACK\n");
-    char* ptr = (char*)calloc(init_capacity * sizeof(stack_elem_t) + 2 * sizeof(uint64_t), sizeof(char));
-    if (ptr == NULL)
+    if (init_capacity > 0)
     {
-        stack -> err_stat = ALLOC_ERROR;
-        return ALLOC_ERROR;
+        char* ptr = (char*)calloc(init_capacity * sizeof(stack_elem_t) + 2 * sizeof(uint64_t), sizeof(char));
+        if (ptr == NULL)
+        {
+            stack -> err_stat = ALLOC_ERROR;
+            return ALLOC_ERROR;
+        }
+
+        stack -> data = (stack_elem_t*)(ptr + sizeof(uint64_t));
+        //data canaries
+        *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)) =  canary_const;
+        *(uint64_t*)(stack -> data + stack -> capacity)       =  canary_const;
+        DEBUG_PRINTF("data left canary  [%llx]\n", *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)));
+        DEBUG_PRINTF("data right canary [%llx]\n", *(uint64_t*)(stack -> data + stack -> capacity));
+        DEBUG_PRINTF("ptr[%p] data[%p]\n", ptr, stack -> data);
     }
+
     stack -> left_canary  =  canary_const;
     stack -> right_canary =  canary_const;
-
-    stack -> data = (stack_elem_t*)(ptr + sizeof(uint64_t));
-    //data canaries
-    *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)) =  canary_const;
-    *(uint64_t*)(stack -> data + stack -> capacity)       =  canary_const;
-    DEBUG_PRINTF("data left canary  [%llx]\n", *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)));
-    DEBUG_PRINTF("data right canary [%llx]\n", *(uint64_t*)(stack -> data + stack -> capacity));
-    DEBUG_PRINTF("ptr[%p] data[%p]\n", ptr, stack -> data);
-
 
     #ifdef HASH_PROTECT
     //hash must not include itself in calculation
@@ -107,14 +110,21 @@ stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, co
            "{\n", stack -> data);
     if (stack -> data == NULL)
     {
-        fprintf_red(stderr, "ERROR: INVALID POINTER(NULL) stack -> data, cannot print info about stack -> data\n");
-        return PTR_ERROR;
+        if (stack -> capacity == 0)
+        {
+            printf("stack is not initialised\n");
+            return stack -> err_stat;
+        }
+        else
+        {
+            fprintf_red(stderr, "ERROR: INVALID POINTER(NULL) stack -> data, cannot print info about stack -> data\n");
+            return PTR_ERROR;
+        }
     }
-    printf("left  canary [%llx] in (%p)\n",
-                 *(stack -> data - 1), stack -> data - 1);
-    printf("right canary [%llx] in (%p)\n",
-                 stack -> data[stack -> capacity], stack -> data + stack -> capacity);
-    printf("hash         [%lld]\n", stack -> data_hash_sum);
+
+    printf("left  canary [%llx] at (%p)\n", *(stack -> data - 1), stack -> data - 1);
+    printf("right canary [%llx] at (%p)\n", stack -> data[stack -> capacity], stack -> data + stack -> capacity);
+    printf("hash         [%lld] at (%p)\n", stack -> data_hash_sum, &stack -> data_hash_sum);
 
     for (int i = 0; i <= stack -> capacity; i++)
         printf("%4d:[%lld][%llx]\n", i, stack -> data[i], stack -> data[i]);
@@ -127,7 +137,7 @@ stack_err stack_verify(stack_t* stack)
 {
     assert(stack);
 
-    if (stack == NULL || stack -> data == NULL)
+    if (stack == NULL || (stack -> data == NULL && stack -> capacity != 0))
     {
         fprintf_red(stderr, "VERIFICATION FAILED\n");
         return PTR_ERROR;
@@ -157,6 +167,11 @@ stack_err stack_verify(stack_t* stack)
     }
 
     //CHECKING DATA CANARIES-------------------------------------------------------------------------------------------------------------------
+    if (stack -> data == NULL)
+    {
+        printf("stack is not initialised\n");
+        return stack -> err_stat;
+    }
     uint64_t data_canary_value = canary_const;
     if (memcmp(&stack -> data[-1], &data_canary_value, sizeof(uint64_t)) != 0)
     {
@@ -183,6 +198,7 @@ stack_err stack_verify(stack_t* stack)
         return HASH_ERROR;
     }
     #endif
+
     return stack -> err_stat;
 }
 
@@ -245,6 +261,12 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
 
     CHECK_STACK(stack);
 
+    if (stack -> capacity == 0)
+    {
+        DEBUG_PRINTF_CYAN("Allocation of non-initialised stack\n");
+        stack_init(stack, 4);
+        return stack -> err_stat;
+    }
     size_t new_capacity = 0;
     switch(state)
     {
@@ -273,14 +295,11 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
         DEBUG_PRINTF_CYAN("new cap:      %ld\n", new_capacity);
         DEBUG_PRINTF_CYAN("offset - [%ld]\n",   (new_capacity - stack -> capacity) * sizeof(stack_elem_t) + sizeof(uint64_t));
 
-        DEBUG_PRINTF("kkkkkkk\n");
         if (state == INCREASE)
             memset(ptr + sizeof(uint64_t) + stack -> capacity * sizeof(stack_elem_t), 0, (new_capacity - stack -> capacity) * sizeof(stack_elem_t));
 
-        DEBUG_PRINTF("11111111111111111111\n");
         stack -> data  = (stack_elem_t*)(ptr + sizeof(uint64_t));
         stack -> capacity = new_capacity;
-        DEBUG_PRINTF("-----------------\n");
 
         stack -> data[-1]           =  canary_const;
         stack -> data[new_capacity] =  canary_const;

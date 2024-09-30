@@ -26,7 +26,7 @@
 
 #define ANSI_COLOR_RED   "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
-#define ANSI_COLOR_CYAN  "\e[46m"
+#define ANSI_COLOR_CYAN  "\x1b[34m"
 #define ANSI_COLOR_RESET "\x1b[0m"
 
 #define printf_red(str, ...)   printf(ANSI_COLOR_RED   str ANSI_COLOR_RESET, #__VA_ARGS__);
