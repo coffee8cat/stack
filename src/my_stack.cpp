@@ -36,15 +36,24 @@ stack_err stack_init(stack_t* stack, size_t init_capacity)
 
         stack -> data = (stack_elem_t*)(ptr + sizeof(uint64_t));
         //data canaries
-        *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)) =  canary_const;
-        *(uint64_t*)(stack -> data + stack -> capacity)       =  canary_const;
-        PRINTF_MAGENTA("data left canary  [%llx]\n", *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)));
-        PRINTF_MAGENTA("data right canary [%llx]\n", *(uint64_t*)(stack -> data + stack -> capacity));
+        #ifdef CANARY_PROTECT
+            *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)) =  canary_const;
+            *(uint64_t*)(stack -> data + stack -> capacity)       =  canary_const;
+            PRINTF_MAGENTA("data left canary  [%llx]\n", *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)));
+            PRINTF_MAGENTA("data right canary [%llx]\n", *(uint64_t*)(stack -> data + stack -> capacity));
+        #endif
+
         PRINTF_MAGENTA("ptr[%p] data[%p]\n", ptr, stack -> data);
     }
+    else
+    {
+        stack -> data = NULL;
+    }
 
-    stack -> left_canary  =  canary_const;
-    stack -> right_canary =  canary_const;
+    #ifdef CANARY_PROTECT
+        stack -> left_canary  =  canary_const;
+        stack -> right_canary =  canary_const;
+    #endif
 
     #ifdef HASH_PROTECT
     //hash must not include itself in calculation
@@ -61,19 +70,25 @@ stack_err stack_delete(stack_t* stack)
 {
     assert(stack);
 
-    memset(stack, 0, (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t));
-    PRINTF_MAGENTA("Deleting stack\n"
-                   "stack size = [%lld]\n", (uint64_t)(&stack -> right_canary - &stack -> left_canary) * (sizeof(stack_elem_t)));
+    if (stack == NULL)
+    {
+        FPRINTF_RED(stderr, "ERROR: INVALID POINTER(NULL) given to stack_delete\n");
+        return PTR_ERROR;
+    }
 
+    PRINTF_MAGENTA("Deleting stack\n"
+                   "stack size = [%ld]\n",
+                   (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t) + sizeof(uint64_t));
+    memset(stack, 0, (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t) + sizeof(uint64_t));
     free(stack -> data);
+/*
     stack -> data = NULL;
     stack -> size = 0;
     stack -> capacity = 0;
     stack -> err_stat = OK;
     stack -> stack_hash_sum = 0;
     stack -> data_hash_sum  = 0;
-
-
+*/
     return stack -> err_stat;
 }
 
@@ -89,8 +104,8 @@ stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, co
     printf(ANSI_COLOR_BLUE);
     printf("stack[%p] created in %s:%ld\n", stack, stack -> file, stack -> line);
     printf("name [%s], called from %s:%d (%s)\n",  stack -> name, call_file, call_line, call_func);
-    printf("left canary  [%llx] at (%p)\n",  stack -> left_canary,  &stack -> left_canary);
-    printf("right canary [%llx] at (%p)\n",  stack -> right_canary, &stack -> right_canary);
+    printf("left canary  [%llX] at (%p)\n",  stack -> left_canary,  &stack -> left_canary);
+    printf("right canary [%llX] at (%p)\n",  stack -> right_canary, &stack -> right_canary);
     printf("hash         [%7lld] at (%p)\n", stack -> stack_hash_sum, &stack -> stack_hash_sum);
     printf("size:        [%lld]\n", stack -> size);
     printf("capacity:    [%lld]\n", stack -> capacity);
@@ -119,14 +134,17 @@ stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, co
             return PTR_ERROR;
         }
     }
-    PRINTF_CYAN("stack data[%p]:\n{\n", stack -> data);
-    PRINTF_CYAN("left  canary [%llx] at (%p)\n", *(stack -> data - 1), stack -> data - 1);
-    PRINTF_CYAN("right canary [%llx] at (%p)\n", stack -> data[stack -> capacity], stack -> data + stack -> capacity);
-    PRINTF_CYAN("hash         [%lld] at (%p)\n", stack -> data_hash_sum, &stack -> data_hash_sum);
+
+    printf(ANSI_COLOR_CYAN);
+    printf("stack data[%p]:\n{\n", stack -> data);
+    printf("left  canary [%llX] at (%p)\n", *(stack -> data - 1), stack -> data - 1);
+    printf("right canary [%llX] at (%p)\n", stack -> data[stack -> capacity], stack -> data + stack -> capacity);
+    printf("hash         [%lld] at (%p)\n", stack -> data_hash_sum, &stack -> data_hash_sum);
 
     for (int i = 0; i <= stack -> capacity; i++)
-        PRINTF_CYAN("%4d:[%lld][%llx]\n", i, stack -> data[i], stack -> data[i]);
-    PRINTF_CYAN("}\n");
+        printf("%4d:[%lld][%llx]\n", i, stack -> data[i], stack -> data[i]);
+    printf("}\n");
+    printf(ANSI_COLOR_RESET);
 
     return stack -> err_stat;
 }
@@ -170,6 +188,7 @@ stack_err stack_verify(stack_t* stack)
         printf("stack is not initialised\n");
         return stack -> err_stat;
     }
+
     uint64_t data_canary_value = canary_const;
     if (memcmp(&stack -> data[-1], &data_canary_value, sizeof(uint64_t)) != 0)
     {
@@ -177,14 +196,12 @@ stack_err stack_verify(stack_t* stack)
         stack -> err_stat = DATA_CANARY_DIED;
         return DATA_CANARY_DIED;
     }
-
     if (memcmp(&stack -> data[stack -> capacity], &data_canary_value, sizeof(uint64_t)) != 0)
     {
         FPRINTF_RED(stderr, "DATA RIGHT CANARY DIED([%llx] != [%llx])\n", stack -> data[stack -> capacity], data_canary_value);
         stack -> err_stat = DATA_CANARY_DIED;
         return DATA_CANARY_DIED;
     }
-
     #endif
 
     #ifdef HASH_PROTECT
@@ -299,10 +316,12 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
         stack -> data  = (stack_elem_t*)(ptr + sizeof(uint64_t));
         stack -> capacity = new_capacity;
 
-        stack -> data[-1]           =  canary_const;
-        stack -> data[new_capacity] =  canary_const;
-        PRINTF_YELLOW("data left canary  [%llx] at (%p)\n", stack -> data[-1], stack -> data - 1);
-        PRINTF_YELLOW("data right canary [%llx] at (%p)\n", stack -> data[new_capacity], &stack -> data[new_capacity]);
+        #ifdef CANARY_PROTECT
+            stack -> data[-1]           =  canary_const;
+            stack -> data[new_capacity] =  canary_const;
+            PRINTF_YELLOW("data left canary  [%llx] at (%p)\n", stack -> data[-1], stack -> data - 1);
+            PRINTF_YELLOW("data right canary [%llx] at (%p)\n", stack -> data[new_capacity], &stack -> data[new_capacity]);
+        #endif
     }
     #ifdef HASH_PROTECT
     //hash must not include itself in calculation
@@ -331,9 +350,8 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
     }
 
     #ifdef HASH_PROTECT
-    //hash must not include itself in calculation
-    stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
-    DEBUG_PRINTF("stack[%p], hash[%p]", stack, &stack -> stack_hash_sum);
+        //hash must not include itself in calculation
+        stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
     CHECK_STACK(stack);
@@ -343,9 +361,8 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
     STACK_DUMP(stack, __func__);
 
     #ifdef HASH_PROTECT
-    //hash must not include itself in calculation
-    stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
-    DEBUG_PRINTF("stack[%p], hash[%p]", stack, &stack -> stack_hash_sum);
+        //hash must not include itself in calculation
+        stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
     CHECK_STACK(stack);
@@ -369,11 +386,9 @@ stack_err stack_pop(stack_t* stack)
         return SIZE_ERROR;
     }
 
-
     #ifdef HASH_PROTECT
-    //hash must not include itself in calculation
-    stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
-    //DEBUG_PRINTF("stack[%p], hash[%p]", stack, &stack -> stack_hash_sum);
+        //hash must not include itself in calculation
+        stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
     printf("size           = %ld\n", stack -> size);
@@ -386,9 +401,8 @@ stack_err stack_pop(stack_t* stack)
     }
 
     #ifdef HASH_PROTECT
-    //hash must not include itself in calculation
-    stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
-    //DEBUG_PRINTF("stack[%p], hash[%p]", stack, &stack -> stack_hash_sum);
+        //hash must not include itself in calculation
+        stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
     CHECK_STACK(stack);
