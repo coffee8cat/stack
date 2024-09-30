@@ -12,29 +12,36 @@
 #ifdef DEBUG
 
 #define DEBUG_PRINTF(...) printf(__VA_ARGS__)
-#define DEBUG_PRINTF_CYAN(str, ...) printf_cyan(str, __VA_ARGS__)
+#define DEBUG_PRINTF_BLUE(str, ...) PRINTF_BLUE(str, __VA_ARGS__)
 
 #else
 
 #define DEBUG_PRINTF(...) ;
-#define DEBUG_PRINTF_CYAN(str, ...) ;
+#define DEBUG_PRINTF_BLUE(str, ...) ;
 
 #endif
 
 #define INIT(var) 0, #var, __FILE__, __LINE__
 #define canary_const 0xD15EA5E
 
-#define ANSI_COLOR_RED   "\x1b[31m"
-#define ANSI_COLOR_GREEN "\x1b[32m"
-#define ANSI_COLOR_CYAN  "\x1b[34m"
-#define ANSI_COLOR_RESET "\x1b[0m"
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 
-#define printf_red(str, ...)   printf(ANSI_COLOR_RED   str ANSI_COLOR_RESET, #__VA_ARGS__);
-#define printf_green(str, ...) printf(ANSI_COLOR_GREEN str ANSI_COLOR_RESET, #__VA_ARGS__);
-#define printf_cyan(str,...)   printf(ANSI_COLOR_CYAN   str ANSI_COLOR_RESET, #__VA_ARGS__);
 
-#define fprintf_red(file,str,...)   fprintf(file, ANSI_COLOR_RED   str ANSI_COLOR_RESET, ##__VA_ARGS__);
-#define fprintf_green(file,str,...) fprintf(file, ANSI_COLOR_GREEN str ANSI_COLOR_RESET, ##__VA_ARGS__);
+#define PRINTF_RED(str, ...)     printf(ANSI_COLOR_RED     str ANSI_COLOR_RESET, #__VA_ARGS__);
+#define PRINTF_GREEN(str, ...)   printf(ANSI_COLOR_GREEN   str ANSI_COLOR_RESET, #__VA_ARGS__);
+#define PRINTF_YELLOW(str, ...)  printf(ANSI_COLOR_YELLOW  str ANSI_COLOR_RESET, #__VA_ARGS__);
+#define PRINTF_BLUE(str,...)     printf(ANSI_COLOR_BLUE    str ANSI_COLOR_RESET, #__VA_ARGS__);
+#define PRINTF_MAGENTA(str, ...) printf(ANSI_COLOR_MAGENTA str ANSI_COLOR_RESET, #__VA_ARGS__);
+#define PRINTF_CYAN(str,...)     printf(ANSI_COLOR_CYAN    str ANSI_COLOR_RESET, #__VA_ARGS__);
+
+#define FPRINTF_RED(file,str,...)   fprintf(file, ANSI_COLOR_RED   str ANSI_COLOR_RESET, ##__VA_ARGS__);
+#define FPRINTF_GREEN(file,str,...) fprintf(file, ANSI_COLOR_GREEN str ANSI_COLOR_RESET, ##__VA_ARGS__);
 /*
 const char* log_file_name = "log_stack.txt";
 FILE* log_thread = fopen(log_file_name, "w");
