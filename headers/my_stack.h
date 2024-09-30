@@ -61,7 +61,7 @@ enum stack_err {
     DATA_CANARY_DIED
 };
 
-typedef int64_t stack_elem_t;
+typedef uint64_t stack_elem_t;
 
 struct stack_t {
     uint64_t left_canary;
@@ -76,6 +76,8 @@ struct stack_t {
     uint64_t stack_hash_sum;
     uint64_t right_canary;
 };
+
+#define UP_TO_EIGHT(x) x + (8 - x % 8) % 8
 
 #define STACK_DUMP(stack, func) stack_dump(stack, __FILE__, __LINE__, func)
 #define CHECK_STACK(stack) stack_check(stack, __FILE__, __LINE__, __func__)
