@@ -49,7 +49,7 @@ FILE* log_thread = fopen(log_file_name, "w");
 */
 enum stack_realloc_state {INCREASE, DECREASE};
 const size_t realloc_coeff = 2;
-const uint64_t hash_coeff = 1;
+const uint64_t hash_coeff = 31;
 
 enum stack_err {
     OK,
@@ -89,6 +89,7 @@ stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, co
 stack_err stack_verify(stack_t* stack);
 inline void stack_check(stack_t* stack, const char* file_name, size_t line, const char* func);
 
+uint64_t murmur64(uint64_t h);
 //uint64_t DJB_hash(char* start, char* end);
 uint64_t calc_hash(char* start, char* end);
 
