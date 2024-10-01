@@ -49,7 +49,7 @@ FILE* log_thread = fopen(log_file_name, "w");
 */
 enum stack_realloc_state {INCREASE, DECREASE};
 const size_t realloc_coeff = 2;
-const uint64_t hash_coeff = 31;
+const uint64_t hash_coeff = 1;
 
 enum stack_err {
     OK,
@@ -62,6 +62,7 @@ enum stack_err {
 };
 
 typedef uint64_t stack_elem_t;
+typedef uint64_t canary_t;
 
 struct stack_t {
     uint64_t left_canary;

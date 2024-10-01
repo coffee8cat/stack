@@ -33,7 +33,7 @@ stack_err stack_init(stack_t* stack, size_t init_capacity)
         //allocate memory for data
         size_t log_byte_capacity = UP_TO_EIGHT(init_capacity * sizeof(stack_elem_t));
         printf("log cap = %ld\n", log_byte_capacity);
-        char* ptr = (char*)calloc(log_byte_capacity + 2 * sizeof(uint64_t), sizeof(char));
+        char* ptr = (char*)calloc(log_byte_capacity + 2 * sizeof(canary_t), sizeof(char));
         //check allocated memory
         if (ptr == NULL)
         {
@@ -43,13 +43,13 @@ stack_err stack_init(stack_t* stack, size_t init_capacity)
         }
 
         //init data pointer
-        stack -> data = (stack_elem_t*)(ptr + sizeof(uint64_t));
+        stack -> data = (stack_elem_t*)(ptr + sizeof(canary_t));
 
         //init data canaries
         #ifdef CANARY_PROTECT
-            *(uint64_t*)((char*)stack -> data - sizeof(uint64_t))  =  canary_const;
-            *(uint64_t*)((char*)stack -> data + log_byte_capacity) =  canary_const;
-            PRINTF_MAGENTA("data left canary  [%p]\n", (char*)stack -> data - sizeof(uint64_t));
+            *(canary_t*)((char*)stack -> data - sizeof(canary_t))  =  canary_const;
+            *(canary_t*)((char*)stack -> data + log_byte_capacity) =  canary_const;
+            PRINTF_MAGENTA("data left canary  [%p]\n", (char*)stack -> data - sizeof(canary_t));
             PRINTF_MAGENTA("data right canary [%p]\n", (char*)stack -> data + log_byte_capacity);
         #endif
         PRINTF_MAGENTA("ptr[%p] data[%p]\n", ptr, stack -> data);
@@ -89,13 +89,11 @@ stack_err stack_delete(stack_t* stack)
         return PTR_ERROR;
     }
 
-    PRINTF_MAGENTA("Deleting stack\n"
-                   "stack size = [%ld]\n",
-                   (size_t)(&stack -> right_canary - &stack -> left_canary) + sizeof(uint64_t));
     //clear memory and free allocated memory
-    memset(stack, 0, (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t) + sizeof(uint64_t));
+    memset(stack, 0, (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t) + sizeof(canary_t));
     free(stack -> data);
 
+    PRINTF_MAGENTA("Stack deleted\n");
     return stack -> err_stat;
 }
 
@@ -145,13 +143,13 @@ stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, co
     printf(ANSI_COLOR_CYAN);
     printf("stack data[%p]:\n{\n", stack -> data);
     printf("left  canary [%llX] at (%p)\n",
-           *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)), (char*)stack -> data - sizeof(uint64_t));
+           *(canary_t*)((char*)stack -> data - sizeof(canary_t)), (char*)stack -> data - sizeof(canary_t));
     printf("right canary [%llX] at (%p)\n",
-           *(uint64_t*)((char*)stack -> data + UP_TO_EIGHT(stack -> capacity * (sizeof(stack_elem_t)))),
+           *(canary_t*)((char*)stack -> data + UP_TO_EIGHT(stack -> capacity * (sizeof(stack_elem_t)))),
            (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));
     printf("hash         [%lld] at (%p)\n", stack -> data_hash_sum, &stack -> data_hash_sum);
 
-    for (int i = 0; i <= stack -> capacity; i++)
+    for (int i = 0; i < stack -> capacity; i++)
         printf("%4d:[%lld][%llx]\n", i, stack -> data[i], stack -> data[i]);
     printf("}\n");
     printf(ANSI_COLOR_RESET);
@@ -177,15 +175,15 @@ stack_err stack_verify(stack_t* stack)
 
     #ifdef CANARY_PROTECT
     //CHECKING STACK CANARIES-----------------------------------------------------------------------------------------------------------------
-    uint64_t canary_value = (uint64_t)canary_const;
-    if (memcmp(&stack -> left_canary, &canary_value, sizeof(uint64_t)) != 0)
+    canary_t canary_value = (canary_t)canary_const;
+    if (memcmp(&stack -> left_canary, &canary_value, sizeof(canary_t)) != 0)
     {
         FPRINTF_RED(stderr, "STACK LEFT CANARY DIED([%llx] != [%llx])\n", stack -> left_canary, canary_value);
         stack -> err_stat = STACK_CANARY_DIED;
         return STACK_CANARY_DIED;
     }
 
-    if (memcmp(&stack -> right_canary, &canary_value, sizeof(uint64_t)) != 0)
+    if (memcmp(&stack -> right_canary, &canary_value, sizeof(canary_t)) != 0)
     {
         FPRINTF_RED(stderr, "STACK RIGHT CANARY DIED([%llx] != [%llx])\n", stack -> right_canary, canary_value);
         stack -> err_stat = STACK_CANARY_DIED;
@@ -199,18 +197,18 @@ stack_err stack_verify(stack_t* stack)
         return stack -> err_stat;
     }
 
-    uint64_t data_canary_value = canary_const;
+    canary_t data_canary_value = canary_const;
     size_t log_byte_capacity = UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t));
-    if (memcmp((char*)stack -> data - sizeof(uint64_t), &data_canary_value, sizeof(uint64_t)) != 0)
+    if (memcmp((char*)stack -> data - sizeof(canary_t), &data_canary_value, sizeof(canary_t)) != 0)
     {
-        FPRINTF_RED(stderr, "DATA LEFT CANARY DIED([%llx] != [%llx])\n", *(uint64_t*)((char*)stack -> data - sizeof(uint64_t)), data_canary_value);
+        FPRINTF_RED(stderr, "DATA LEFT CANARY DIED([%llx] != [%llx])\n", *(canary_t*)((char*)stack -> data - sizeof(canary_t)), data_canary_value);
         stack -> err_stat = DATA_CANARY_DIED;
         return DATA_CANARY_DIED;
     }
-    if (memcmp((char*)stack -> data + log_byte_capacity, &data_canary_value, sizeof(uint64_t)) != 0)
+    if (memcmp((char*)stack -> data + log_byte_capacity, &data_canary_value, sizeof(canary_t)) != 0)
     {
         FPRINTF_RED(stderr, "DATA RIGHT CANARY DIED([%llx](%p) != [%llx])\n",
-                    *(uint64_t*)((char*)stack -> data + log_byte_capacity), (char*)stack -> data + log_byte_capacity,
+                    *(canary_t*)((char*)stack -> data + log_byte_capacity), (char*)stack -> data + log_byte_capacity,
                     data_canary_value);
         stack -> err_stat = DATA_CANARY_DIED;
         return DATA_CANARY_DIED;
@@ -367,8 +365,8 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
     size_t log_byte_capacity = UP_TO_EIGHT(new_capacity * sizeof(stack_elem_t));
 
     //Starting reallocation
-    PRINTF_YELLOW("ptr to reallocate [%p]\n", (char*)stack -> data - sizeof(uint64_t));
-    char* ptr = (char*)realloc((char*)stack -> data - sizeof(uint64_t), log_byte_capacity + 2 * sizeof(uint64_t));
+    PRINTF_YELLOW("ptr to reallocate [%p]\n", (char*)stack -> data - sizeof(canary_t));
+    char* ptr = (char*)realloc((char*)stack -> data - sizeof(canary_t), log_byte_capacity + 2 * sizeof(canary_t));
     //checking reallocated pointer
     if (ptr == NULL)
     {
@@ -381,26 +379,26 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
     {
         //print info about reallocation
         PRINTF_YELLOW("ptr start:    %p\n", ptr);
-        PRINTF_YELLOW("data start:   %p\n", ptr + sizeof(uint64_t));
-        PRINTF_YELLOW("ptr new area: %p\n", ptr + sizeof(uint64_t) + sizeof(stack_elem_t) * stack -> capacity);
+        PRINTF_YELLOW("data start:   %p\n", ptr + sizeof(canary_t));
+        PRINTF_YELLOW("ptr new area: %p\n", ptr + sizeof(canary_t) + sizeof(stack_elem_t) * stack -> capacity);
         PRINTF_YELLOW("stack cap:    %ld\n", stack -> capacity);
         PRINTF_YELLOW("log cap:      %ld\n", log_byte_capacity);
         PRINTF_YELLOW("new cap:      %ld\n", new_capacity);
-        PRINTF_YELLOW("offset - [%ld]\n",   (new_capacity - stack -> capacity) * sizeof(stack_elem_t) + sizeof(uint64_t));
+        PRINTF_YELLOW("offset - [%ld]\n",   (new_capacity - stack -> capacity) * sizeof(stack_elem_t) + sizeof(canary_t));
 
         //clear added memory in case of increasing
         if (state == INCREASE)
-            memset(ptr + sizeof(uint64_t) + stack -> capacity * sizeof(stack_elem_t), 0, (new_capacity - stack -> capacity) * sizeof(stack_elem_t));
+            memset(ptr + sizeof(canary_t) + stack -> capacity * sizeof(stack_elem_t), 0, (new_capacity - stack -> capacity) * sizeof(stack_elem_t));
 
         //updating data pointer and capacity
-        stack -> data  = (stack_elem_t*)(ptr + sizeof(uint64_t));
+        stack -> data  = (stack_elem_t*)(ptr + sizeof(canary_t));
         stack -> capacity = new_capacity;
 
         //updating canary protection
         #ifdef CANARY_PROTECT
-            *(uint64_t*)((char*)stack -> data - sizeof(uint64_t))  =  canary_const;
-            *(uint64_t*)((char*)stack -> data + log_byte_capacity) =  canary_const;
-            PRINTF_YELLOW("data left canary  [%llx] at (%p)\n", *((char*)stack -> data - sizeof(uint64_t)), (char*)stack -> data - sizeof(uint64_t));
+            *(canary_t*)((char*)stack -> data - sizeof(canary_t))  =  canary_const;
+            *(canary_t*)((char*)stack -> data + log_byte_capacity) =  canary_const;
+            PRINTF_YELLOW("data left canary  [%llx] at (%p)\n", *((char*)stack -> data - sizeof(canary_t)), (char*)stack -> data - sizeof(canary_t));
             PRINTF_YELLOW("data right canary [%llx] at (%p)\n", *((char*)stack -> data + log_byte_capacity), (char*)stack -> data + log_byte_capacity);
         #endif
     }
