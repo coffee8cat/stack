@@ -49,7 +49,7 @@ FILE* log_thread = fopen(log_file_name, "w");
 */
 enum stack_realloc_state {INCREASE, DECREASE};
 const size_t realloc_coeff = 2;
-const uint64_t hash_coeff = 1;
+const uint64_t hash_coeff = 33;
 
 enum stack_err {
     OK,
@@ -97,6 +97,6 @@ uint64_t calc_hash(char* start, char* end);
 stack_err stack_realloc(stack_t* stack, stack_realloc_state state);
 
 stack_err stack_push(stack_t* stack, stack_elem_t elem);
-stack_err stack_pop (stack_t* stack);
+stack_elem_t stack_pop (stack_t* stack);
 
 #endif //_STACK_HEADER_H__

@@ -15,6 +15,5 @@ int main()
     STACK_DUMP(&stack, __func__);
 
     stack_delete(&stack);
-    //fclose(log_thread);
     return 0;
 }

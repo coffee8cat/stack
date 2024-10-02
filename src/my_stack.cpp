@@ -68,7 +68,7 @@ stack_err stack_init(stack_t* stack, size_t init_capacity)
     //init hash protection
     #ifdef HASH_PROTECT
     //hash must not include itself in calculation
-    stack -> stack_hash_sum = murmur64(calc_hash((char*)stack, (char*)&stack -> stack_hash_sum));
+    stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
     PRINTF_MAGENTA("Stack Initialised\n");
@@ -90,8 +90,15 @@ stack_err stack_delete(stack_t* stack)
     }
 
     //clear memory and free allocated memory
-    memset(stack, 0, (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t) + sizeof(canary_t));
+    if (stack -> data ==NULL)
+    {
+        FPRINTF_RED(stderr, "ERROR: INVALID POINTER(NULL) to data in stack: cannot clear data\n");
+    }
+    else
+        memset((char*)stack -> data - sizeof(canary_t), 0, UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)) + 2 * sizeof(canary_t));
+
     free(stack -> data);
+    memset(stack, 0, (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t) + sizeof(canary_t));
 
     PRINTF_MAGENTA("Stack deleted\n");
     return stack -> err_stat;
@@ -111,9 +118,9 @@ stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, co
     printf("name [%s], called from %s:%d (%s)\n",  stack -> name, call_file, call_line, call_func);
     printf("left canary  [%llX] at (%p)\n",  stack -> left_canary,  &stack -> left_canary);
     printf("right canary [%llX] at (%p)\n",  stack -> right_canary, &stack -> right_canary);
-    printf("hash         [%7lld] at (%p)\n", stack -> stack_hash_sum, &stack -> stack_hash_sum);
-    printf("size:        [%lld]\n", stack -> size);
-    printf("capacity:    [%lld]\n", stack -> capacity);
+    printf("hash         [%ld] at (%p)\n", stack -> stack_hash_sum, &stack -> stack_hash_sum);
+    printf("size:        [%ld]\n", stack -> size);
+    printf("capacity:    [%ld]\n", stack -> capacity);
     printf("err_stat:    [%s]\n", err_stats[stack -> err_stat]);
     printf(ANSI_COLOR_RESET);
 /*
@@ -218,7 +225,7 @@ stack_err stack_verify(stack_t* stack)
     #ifdef HASH_PROTECT
     uint64_t hash = 0;
     DEBUG_PRINTF("stack -> hash sum[%p]\n");
-    if (stack -> stack_hash_sum != (hash = murmur64(calc_hash((char*)stack, (char*)&stack -> stack_hash_sum))))
+    if (stack -> stack_hash_sum != (hash = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum)))
     {
         FPRINTF_RED(stderr, "UNDETERMINED STACK HASH CHANGE [%lld] != [%lld]\n", stack -> stack_hash_sum, hash);
         return HASH_ERROR;
@@ -294,25 +301,7 @@ uint64_t MurmurHash64A(const void* key, int len, uint64_t seed)
 
     return h;
 }
-/*
-uint64_t DJB_hash(char* start, char* end)
-{
-    if (start == NULL || end == NULL)
-    {
-        FPRINTF_RED(stderr, "ERROR: Invalid adress(NULL) came to %s in %s:%d\n", __func__, __FILE__, __LINE__);
-        return 0;
-    }
 
-    uint64_t hash = 5381;
-    char* curr = start;
-    while (curr <= end)
-    {
-        hash = ((hash << 5) + hash) + (unsigned char)(*curr);
-    }
-
-    return hash;
-}
-*/
 uint64_t calc_hash(char* start, char* end)
 {
     if (start == NULL || end == NULL)
@@ -323,13 +312,11 @@ uint64_t calc_hash(char* start, char* end)
     DEBUG_PRINTF("HASH CALCULATION START\n");
     DEBUG_PRINTF("start [%p]\n", start);
     DEBUG_PRINTF("end   [%p]\n", end);
-    uint64_t p = hash_coeff;
     uint64_t hash_sum = 0;
     char* curr = start;
     while (curr < end)
     {
-        hash_sum += p * (unsigned char)(*curr);
-        p = p * hash_coeff;
+        hash_sum = hash_sum * hash_coeff + *curr;
         //DEBUG_PRINTF("hash sum = [%lld]\n", hash_sum);
         //DEBUG_PRINTF("p        = [%lld]\n", p);
         //DEBUG_PRINTF("pointer  = [%lX]\n", curr);
@@ -406,8 +393,8 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
     //update hash
     #ifdef HASH_PROTECT
         //hash must not include itself in calculation
-        stack -> data_hash_sum = murmur64(calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t))));
-        stack -> stack_hash_sum = murmur64(calc_hash((char*)stack, (char*)&stack -> stack_hash_sum));
+        stack -> data_hash_sum = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));
+        stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
     STACK_DUMP(stack, __func__);
     PRINTF_YELLOW("Reallocation completed\n");
@@ -436,8 +423,8 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
         //update hash
         #ifdef HASH_PROTECT
             //hash must not include itself in calculation
-            stack -> data_hash_sum = murmur64(calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t))));
-            stack -> stack_hash_sum = murmur64(calc_hash((char*)stack, (char*)&stack -> stack_hash_sum));
+            stack -> data_hash_sum = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));
+            stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
         #endif
         CHECK_STACK(stack);
     }
@@ -449,8 +436,8 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
     //update hash
     #ifdef HASH_PROTECT
         //hash must not include itself in calculation
-        stack -> data_hash_sum = murmur64(calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t))));
-        stack -> stack_hash_sum = murmur64(calc_hash((char*)stack, (char*)&stack -> stack_hash_sum));
+        stack -> data_hash_sum = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));
+        stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
     STACK_DUMP(stack, __func__);
@@ -460,16 +447,18 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
     return stack -> err_stat;
 }
 
-stack_err stack_pop(stack_t* stack)
+stack_elem_t stack_pop(stack_t* stack)
 {
     assert(stack);
     PRINTF_RED("-----STACK POP-----\n");
     CHECK_STACK(stack);
 
+    stack_elem_t temp = 0;
     //check if stack is empty
     if (stack -> size > 0)
     {
         //remove element
+        temp = *(stack -> data + stack -> size - 1);
         *(stack -> data + stack -> size - 1) = 0;
         stack -> size--;
     }
@@ -483,8 +472,8 @@ stack_err stack_pop(stack_t* stack)
     //update hash
     #ifdef HASH_PROTECT
         //hash must not include itself in calculation
-        stack -> data_hash_sum = murmur64(calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t))));
-        stack -> stack_hash_sum = murmur64(calc_hash((char*)stack, (char*)&stack -> stack_hash_sum));
+        stack -> data_hash_sum  = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));
+        stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
     //check if reallocation needed
@@ -500,5 +489,5 @@ stack_err stack_pop(stack_t* stack)
     CHECK_STACK(stack);
     STACK_DUMP(stack, __func__);
     PRINTF_RED("-----STACK POP END-----\n");
-    return stack -> err_stat;
+    return temp;
 }
