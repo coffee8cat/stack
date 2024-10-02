@@ -21,7 +21,7 @@ stack_err stack_init(stack_t* stack, size_t init_capacity)
     assert(stack);
 
     //clear memory
-    memset(stack, 0, ((char*)&stack -> right_canary - (char*)stack));
+    memset(&stack -> size, 0, ((char*)&stack -> right_canary - (char*)&stack -> size));
 
     stack -> capacity = init_capacity;
     stack -> size = 0;
