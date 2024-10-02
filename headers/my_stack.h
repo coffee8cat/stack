@@ -32,7 +32,6 @@
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
-
 #define PRINTF_RED(str, ...)     printf(ANSI_COLOR_RED     str ANSI_COLOR_RESET, #__VA_ARGS__);
 #define PRINTF_GREEN(str, ...)   printf(ANSI_COLOR_GREEN   str ANSI_COLOR_RESET, #__VA_ARGS__);
 #define PRINTF_YELLOW(str, ...)  printf(ANSI_COLOR_YELLOW  str ANSI_COLOR_RESET, #__VA_ARGS__);
@@ -42,23 +41,23 @@
 
 #define FPRINTF_RED(file,str,...)   fprintf(file, ANSI_COLOR_RED   str ANSI_COLOR_RESET, ##__VA_ARGS__);
 #define FPRINTF_GREEN(file,str,...) fprintf(file, ANSI_COLOR_GREEN str ANSI_COLOR_RESET, ##__VA_ARGS__);
-/*
-const char* log_file_name = "log_stack.txt";
-FILE* log_thread = fopen(log_file_name, "w");
-#define LOG_DUMP(...) fprintf(log_thread, ##__VA_ARGS__)
-*/
+
 enum stack_realloc_state {INCREASE, DECREASE};
 const size_t realloc_coeff = 2;
 const uint64_t hash_coeff = 1;
+const size_t default_stack_size = 8;
 
 enum stack_err {
-    OK,
-    SIZE_ERROR,
-    ALLOC_ERROR,
-    HASH_ERROR,
-    PTR_ERROR,
-    STACK_CANARY_DIED,
-    DATA_CANARY_DIED
+    OK          = 0,
+    PTR_ERROR   = 1 << 0,
+    ALLOC_ERROR = 1 << 1,
+    SIZE_ERROR  = 1 << 2,
+    STACK_HASH_ERROR  = 1 << 3,
+    DATA_HASH_ERROR   = 1 << 4,
+    LEFT_STACK_CANARY_DIED  = 1 << 5,
+    RIGHT_STACK_CANARY_DIED = 1 << 6,
+    LEFT_DATA_CANARY_DIED   = 1 << 7,
+    RIGHT_DATA_CANARY_DIED  = 1 << 8
 };
 
 typedef uint64_t stack_elem_t;
@@ -68,36 +67,39 @@ struct stack_t {
     #ifdef CANARY_PROTECT
     uint64_t left_canary;
     #endif
+
+    #ifdef DEBUG
     const char* name;
     const char* file;
     size_t line;
+    #endif
+
     size_t size;
     size_t capacity;
-    stack_err err_stat;
+    uint64_t err_stat;
     stack_elem_t* data;
+
     #ifdef HASH_PROTECT
     uint64_t data_hash_sum;
     uint64_t stack_hash_sum;
     #endif
+
     #ifdef CANARY_PROTECT
     uint64_t right_canary;
     #endif
 };
 
-#define UP_TO_EIGHT(x) x + (8 - x % 8) % 8
+#define UP_TO_EIGHT(x) (x) + (8 - (x) % 8) % 8
 
 #define STACK_DUMP(stack, func) stack_dump(stack, __FILE__, __LINE__, func)
-#define CHECK_STACK(stack) stack_check(stack, __FILE__, __LINE__, __func__)
 
 stack_err stack_init   (stack_t* stack, int init_size);
 stack_err stack_delete (stack_t* stack);
 
 stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, const char* call_func);
-stack_err stack_verify(stack_t* stack);
-inline void stack_check(stack_t* stack, const char* file_name, size_t line, const char* func);
+stack_err stack_dump_errors(stack_t* stack);
+uint64_t stack_verify(stack_t* stack);
 
-uint64_t murmur64(uint64_t h);
-//uint64_t DJB_hash(char* start, char* end);
 uint64_t calc_hash(char* start, char* end);
 
 stack_err stack_realloc(stack_t* stack, stack_realloc_state state);

@@ -5103,3 +5103,2099 @@ Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
 Directory:	C:\Users\agniy\ded\stack
 
 --------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x3A44 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:42:12, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:42:21
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#4: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x3A44 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:42:12, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:42:21
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x2FF0 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:43:20, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:43:29
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#4: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x2FF0 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:43:20, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:43:29
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#2: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F78B2D. Попытка прочесть данные по адресу 0x00000014 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#2: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x38D0 (Main), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 3 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 4 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:45:50, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:45:59
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#2: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F78B2D. Попытка прочесть данные по адресу 0x00000014 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x38D0 (Main), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 3 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 4 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:45:50, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:45:59
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#2: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F78B2D. Попытка прочесть данные по адресу 0x00000014 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#2: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x118C (Main), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 3 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 4 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:48:02, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:48:11
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#2: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F78B2D. Попытка прочесть данные по адресу 0x00000014 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x118C (Main), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 3 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 4 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:48:02, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:48:11
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#2: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F78B2D. Попытка прочесть данные по адресу 0x00000014 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#2: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x1F5C (Main), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 3 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 4 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:49:20, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:49:30
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#2: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F78B2D. Попытка прочесть данные по адресу 0x00000014 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x1F5C (Main), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 3 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 4 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:49:20, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:49:30
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x42C0 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:50:48, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:50:58
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#4: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x42C0 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:50:48, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:50:58
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x339C (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:53:52, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:54:02
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#4: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x339C (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:53:52, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:54:02
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#2: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F78B2D. Попытка прочесть данные по адресу 0x00000014 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#2: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x2E10 (Main), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 3 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 4 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:54:37, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:54:46
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#2: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F78B2D. Попытка прочесть данные по адресу 0x00000014 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x2E10 (Main), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 3 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 4 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:54:37, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:54:46
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x2CA4 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:55:35, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:55:46
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#4: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x2CA4 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:55:35, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:55:46
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0xD08 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:56:14, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:56:23
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#4: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0xD08 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:56:14, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:56:24
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0xAD4 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:56:46, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:56:54
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#3: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F72086. Попытка прочесть данные по адресу 0x00000004 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#4: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0xAD4 (Main), GetLastError(): 183 (Невозможно создать файл, так как он уже существует), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12392:
+
+  12390: 
+  12391: $   FILE* f = NULL;
+=>12392: $   fopen_s (&f, file, "r");
+  12393:     if (!f) {$ return 0; }
+  12394: 
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 3 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 4 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 5 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 6 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:56:46, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:56:55
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib предупреждает:
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: Нарушение доступа к памяти.
+
+#2: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F78B2D. Попытка прочесть данные по адресу 0x00000014 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+#2: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x52C0 (Main), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 3 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 4 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:57:30, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:57:40
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\agniy\ded\stack\build\strfunc.exe,
+
+ВНЕЗАПНО: signal (11, 0x00): SIGSEGV: Доступ по неверному указателю. Ставьте ассерты! 
+
+Нарушение доступа к памяти.
+
+#2: Исключение EXCEPTION_ACCESS_VIOLATION (0xC0000005) при выполнении кода по адресу 0x76F78B2D. Попытка прочесть данные по адресу 0x00000014 в модуле C:\WINDOWS\SYSTEM32\ntdll.dll. Спасибо _txVectoredExceptionHandler(), что сообщил. Люблю его <3
+
+С помощью функции signal() вы можете сами обработать эту ошибку.
+
+#3: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x52C0 (Main), errno: 22 (Invalid argument). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in intptr_t {anonymous}::TX::_txReadSource(char*, intptr_t, const char*, int, int, int) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12395:
+
+  12393:     if (!f) {$ return 0; }
+  12394: 
+=>12395: $   int n = 1;
+  12396:     while (!feof (f))
+  12397:         {
+
+# 1 in const char* {anonymous}::TX::_txCaptureStackBackTraceTX(int, bool) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:12466:
+
+  12464:                 {
+  12465: $               s += _tx_snprintf_s (s, SZ_, ":\n\n");
+=>12466: $               s += _txReadSource  (s, SZ_, loc->file, loc->line - 2, loc->line + 2, loc->line);
+  12467:                 }
+  12468:             }
+
+# 2 in int {anonymous}::TX::_txSetWindowText(HWND, const char*, const char*, int, const wchar_t*) at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9319:
+
+   9317:         }
+   9318: 
+=> 9319: $   tools::getWindowText (wnd, title, _TX_BUFSIZE-1);
+   9320: $   int len = (int) wcslen (title); if (len >= (int)_TX_BUFSIZE) len = _TX_BUFSIZE-1;
+   9321: $   memcpy (oldTitle, title, sizeof (oldTitle));
+
+# 3 in void {anonymous}::TX::_txCleanup() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:9075:
+
+   9073:             {
+   9074: $           EnableWindow     (console, true);
+=> 9075: $           _txSetWindowText (console, " [ЗАВЕРШЕНО]", " [FINISHED]", 2, L"\x0417" /* 'З' */ L"\x0046" /* 'F' */);
+   9076:             }
+   9077:         }
+
+# 4 in void {anonymous}::TX::_txOnCExit() at c:\users\agniy\ded\codeblocks\mingw\include\txlib.h:8925:
+
+   8923:     OutputDebugString ("\n");
+   8924: 
+=> 8925: $5  _txCleanup();
+   8926: 
+   8927:     _TX_CALLv (Win32::_cexit, ());
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\agniy\ded\codeblocks\mingw\include\txlib.h
+Compiled:	Oct  2 2024 21:57:30, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Oct 02 2024 21:57:40
+
+Run file:	C:\Users\agniy\ded\stack\build\strfunc.exe
+Directory:	C:\Users\agniy\ded\stack
+
+--------------------------------------------------
