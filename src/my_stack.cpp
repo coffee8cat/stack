@@ -123,23 +123,23 @@ stack_err stack_dump_errors(stack_t* stack)
         return PTR_ERROR;
     }
     uint64_t errnum = stack -> err_stat;
-    if (errnum << 0)
+    if (errnum & PTR_ERROR)
         FPRINTF_RED(stderr, "INVALID POINTER\n");
-    if (errnum << 1)
+    if (errnum & ALLOC_ERROR)
         FPRINTF_RED(stderr, "ALLOCATION ERROR\n");
-    if (errnum << 2)
+    if (errnum & SIZE_ERROR)
         FPRINTF_RED(stderr, "SIZE ERROR\n");
-    if (errnum << 3)
+    if (errnum & STACK_HASH_ERROR)
         FPRINTF_RED(stderr, "STACK HASH ERROR\n");
-    if (errnum << 4)
+    if (errnum & DATA_HASH_ERROR)
         FPRINTF_RED(stderr, "DATA HASH ERROR\n");
-    if (errnum << 5)
+    if (errnum & LEFT_STACK_CANARY_DIED)
         FPRINTF_RED(stderr, "LEFT STACK CANARY DIED\n");
-    if (errnum << 6)
+    if (errnum & RIGHT_STACK_CANARY_DIED)
         FPRINTF_RED(stderr, "RIGHT STACK CANARY DIED\n");
-    if (errnum << 7)
+    if (errnum & LEFT_DATA_CANARY_DIED)
         FPRINTF_RED(stderr, "LEFT DATA CANARY DIED\n");
-    if (errnum << 8)
+    if (errnum & RIGHT_DATA_CANARY_DIED)
         FPRINTF_RED(stderr, "RIGHT DATA CANARY DIED\n");
 
     return OK;
@@ -157,10 +157,10 @@ uint64_t stack_verify(stack_t* stack)
     //CHECKING STACK CANARIES-----------------------------------------------------------------------------------------------------------------
     canary_t canary_value = (canary_t)canary_const;
     if (memcmp(&stack -> left_canary, &canary_value, sizeof(canary_t)) != 0)
-        stack -> err_stat += LEFT_STACK_CANARY_DIED;
+        stack -> err_stat = stack -> err_stat | LEFT_STACK_CANARY_DIED;
 
     if (memcmp(&stack -> right_canary, &canary_value, sizeof(canary_t)) != 0)
-        stack -> err_stat = RIGHT_STACK_CANARY_DIED;
+        stack -> err_stat = stack -> err_stat | RIGHT_STACK_CANARY_DIED;
 
     //CHECKING DATA CANARIES-------------------------------------------------------------------------------------------------------------------
     if (stack -> data == NULL)
@@ -174,18 +174,18 @@ uint64_t stack_verify(stack_t* stack)
     canary_t data_canary_value = canary_const;
     size_t log_byte_capacity = UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t));
     if (memcmp((char*)stack -> data - sizeof(canary_t), &data_canary_value, sizeof(canary_t)) != 0)
-        stack -> err_stat += LEFT_DATA_CANARY_DIED;
+        stack -> err_stat = stack -> err_stat | LEFT_DATA_CANARY_DIED;
 
     if (memcmp((char*)stack -> data + log_byte_capacity, &data_canary_value, sizeof(canary_t)) != 0)
-        stack -> err_stat += RIGHT_DATA_CANARY_DIED;
+        stack -> err_stat = stack -> err_stat | RIGHT_DATA_CANARY_DIED;
     #endif
 
     #ifdef HASH_PROTECT
     uint64_t hash = 0;
     if (stack -> stack_hash_sum != calc_hash((char*)stack, (char*)&stack -> stack_hash_sum))
-        stack -> err_stat += STACK_HASH_ERROR;
+        stack -> err_stat = stack -> err_stat | STACK_HASH_ERROR;
     if (stack -> data_hash_sum != calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t))))
-        stack -> err_stat += DATA_HASH_ERROR;
+        stack -> err_stat = stack -> err_stat | DATA_HASH_ERROR;
     #endif
 
     return stack -> err_stat;
@@ -237,7 +237,7 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
         #endif
         return ALLOC_ERROR;
     }
-    else
+    else // wtf
     {
         if (state == INCREASE)
             memset(ptr + sizeof(canary_t) + stack -> capacity * sizeof(stack_elem_t), 0, (new_capacity - stack -> capacity) * sizeof(stack_elem_t));

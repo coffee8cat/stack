@@ -18,7 +18,7 @@ BUILD_DIR = build
 
 OBJ_DIR = obj
 OBJECTS = $(wildcard $(OBJ_DIR)/*.o)
-EXECUTABLE = strfunc.exe
+EXECUTABLE = stack.exe
 
 all: $(SOURCES) $(BUILD_DIR)
 	$(CC) $(SOURCES) -o $(BUILD_DIR)/$(EXECUTABLE) -I$(HEADERS_DIR) -D$(DEBUG) $(CFLAGS)
@@ -49,7 +49,7 @@ create_obj:
 comp_run:
 	make create_obj
 	make linkage
-	.\$(BUILD_DIR)/$(EXECUTABLE)
+#.\$(BUILD_DIR)/$(EXECUTABLE)
 
 linkage:
 	$(CC) $(OBJECTS) -o $(BUILD_DIR)/$(EXECUTABLE)
