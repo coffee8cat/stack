@@ -65,7 +65,9 @@ typedef uint64_t stack_elem_t;
 typedef uint64_t canary_t;
 
 struct stack_t {
+    #ifdef CANARY_PROTECT
     uint64_t left_canary;
+    #endif
     const char* name;
     const char* file;
     size_t line;
@@ -73,9 +75,13 @@ struct stack_t {
     size_t capacity;
     stack_err err_stat;
     stack_elem_t* data;
+    #ifdef HASH_PROTECT
     uint64_t data_hash_sum;
     uint64_t stack_hash_sum;
+    #endif
+    #ifdef CANARY_PROTECT
     uint64_t right_canary;
+    #endif
 };
 
 #define UP_TO_EIGHT(x) x + (8 - x % 8) % 8
@@ -83,7 +89,7 @@ struct stack_t {
 #define STACK_DUMP(stack, func) stack_dump(stack, __FILE__, __LINE__, func)
 #define CHECK_STACK(stack) stack_check(stack, __FILE__, __LINE__, __func__)
 
-stack_err stack_init   (stack_t* stack, size_t init_size);
+stack_err stack_init   (stack_t* stack, int init_size);
 stack_err stack_delete (stack_t* stack);
 
 stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, const char* call_func);

@@ -4,7 +4,7 @@
 int main()
 {
     stack_t stack = {INIT(stack)};
-    stack_init(&stack, 0);
+    stack_init(&stack, -1);
     STACK_DUMP(&stack, __func__);
     for (size_t i = 0; i < 5; i++)
         stack_push(&stack, 10 * i);

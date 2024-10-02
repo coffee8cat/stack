@@ -16,15 +16,25 @@ const char* err_stats[] = {
 };
 
 
-stack_err stack_init(stack_t* stack, size_t init_capacity)
+stack_err stack_init(stack_t* stack, int init_capacity)
 {
     assert(stack);
 
     //clear memory
+<<<<<<< Updated upstream
     memset(stack, 0, ((char*)&stack -> right_canary - (char*)stack));
+=======
+    if (init_capacity < 0)
+    {
+        FPRINTF_RED(stderr, "ERROR: Invalid value for stack capacity : [%d] < 0\n"
+                            "INITIALISING EMPTY STACK\n", init_capacity);
+        init_capacity = 0;
+    }
+    memset(&stack -> size, 0, ((char*)&stack -> right_canary - (char*)&stack -> size));
+>>>>>>> Stashed changes
 
     stack -> capacity = init_capacity;
-    stack -> size = 0;
+
 
     PRINTF_MAGENTA("INIT STACK\n");
     //check if stack is empty
