@@ -1,3 +1,7 @@
 
 /build
 /obj
+/obj
+*.o
+*.exe
+*.log
