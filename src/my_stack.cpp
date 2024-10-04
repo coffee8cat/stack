@@ -199,7 +199,7 @@ uint64_t stack_verify(stack_t* stack)
     return stack -> err_stat;
 }
 
-uint64_t calc_hash(char* start, char* end)
+static uint64_t calc_hash(char* start, char* end)
 {
     if (start == NULL || end == NULL)
     {
@@ -216,13 +216,12 @@ uint64_t calc_hash(char* start, char* end)
     return hash_sum;
 }
 
-stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
+static stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
 {
     if (stack_verify(stack) != OK)
     {
-        //STACK_DUMP(stack, __func__);
-        //stack_dump_errors(stack);
-        printf("ERROR in stack_realloc\n");
+        STACK_DUMP(stack, __func__);
+        stack_dump_errors(stack);
         return OK;
     }
 
@@ -256,10 +255,9 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
         return ALLOC_ERROR;
     }
 
-    stack -> capacity = new_capacity;
-    if (state == INCREASE)
-        memset(ptr ON_CANARY(+ sizeof(canary_t)) + (new_capacity / 2) * stack -> elem_size, 0,
-               (new_capacity / 2) * stack -> elem_size);
+    stack -> capacity = realloc_capacity;
+    memset(ptr ON_CANARY(+ sizeof(canary_t)) + stack -> size * stack -> elem_size, 0,
+           (realloc_capacity - stack -> size) * stack -> elem_size);
 
     stack -> data = ptr ON_CANARY(+ sizeof(canary_t));
 
@@ -280,9 +278,8 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
 {
     if (stack_verify(stack) != OK)
     {
-        //STACK_DUMP(stack, __func__);
-        //stack_dump_errors(stack);
-        printf("PUSH ERROR\n");
+        STACK_DUMP(stack, __func__);
+        stack_dump_errors(stack);
         return OK;
     }
 
@@ -297,7 +294,6 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
     }
 
     memcpy((char*)stack -> data + stack -> size * stack -> elem_size, &elem, stack -> elem_size);
-    //stack -> data[stack -> size] = elem;
     (stack -> size)++;
 
     #ifdef HASH_PROTECTION
@@ -312,9 +308,8 @@ stack_err stack_pop(stack_t* stack, void* temp)
 {
     if (stack_verify(stack) != OK)
     {
-        // STACK_DUMP(stack, __func__);
-        // stack_dump_errors(stack);
-        printf("ERROR in stack_pop\n");
+        STACK_DUMP(stack, __func__);
+        stack_dump_errors(stack);
         return OK;
     }
 

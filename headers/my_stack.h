@@ -113,9 +113,9 @@ stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, co
 stack_err stack_dump_errors(stack_t* stack);
 uint64_t stack_verify(stack_t* stack);
 
-uint64_t calc_hash(char* start, char* end);
+static uint64_t calc_hash(char* start, char* end);
 
-stack_err stack_realloc(stack_t* stack, stack_realloc_state state);
+static stack_err stack_realloc(stack_t* stack, stack_realloc_state state);
 
 stack_err stack_push(stack_t* stack, stack_elem_t elem);
 stack_err stack_pop (stack_t* stack, void* temp);

@@ -10,6 +10,12 @@ int main()
         stack_push(&stack, i * 10);
 
     STACK_DUMP(&stack, __func__);
+    uint64_t temp = 0;
+    for (size_t i = 0; i < 20; i++)
+    {
+        stack_pop(&stack, &temp);
+        printf("temp = [%lld]\n", temp);
+    }
     stack_delete(&stack);
     return 0;
 }
