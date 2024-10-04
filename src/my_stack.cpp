@@ -5,43 +5,38 @@
 #include "my_stack.h"
 #include "stack_config.h"
 
-stack_err stack_init(stack_t* stack, int init_capacity)
+stack_err stack_init(stack_t* stack, size_t init_capacity, size_t elem_size)
 {
-    if (init_capacity < 0)
-    {
-        FPRINTF_RED(stderr, "ERROR: Invalid value for stack capacity : [%d] < 0\n"
-                            "INITIALISING EMPTY STACK\n", init_capacity);
-        init_capacity = default_stack_size;
-    }
     memset(&stack -> size, 0, ((char*)&stack -> right_canary - (char*)&stack -> size));
 
-    stack -> capacity = init_capacity;
+    stack -> capacity  = init_capacity;
+    stack -> elem_size = elem_size;
     if (init_capacity > 0)
     {
-        size_t log_byte_capacity = UP_TO_EIGHT(init_capacity * sizeof(stack_elem_t));
+        size_t aligned_byte_capacity = UP_TO_EIGHT(init_capacity * elem_size);
 
-        char* ptr = (char*)calloc(log_byte_capacity + 2 * sizeof(canary_t), sizeof(char));
+        char* ptr = (char*)calloc(aligned_byte_capacity ON_CANARY(+ 2 * sizeof(canary_t)), sizeof(char));
         if (ptr == NULL)
         {
-            stack -> err_stat = ALLOC_ERROR;
+            stack -> err_stat = stack -> err_stat | ALLOC_ERROR;
             return ALLOC_ERROR;
         }
-        stack -> data = (stack_elem_t*)(ptr + sizeof(canary_t));
+        stack -> data = ptr ON_CANARY(+ sizeof(canary_t));
 
-        #ifdef CANARY_PROTECT
-            *(canary_t*)((char*)stack -> data - sizeof(canary_t))  =  canary_const;
-            *(canary_t*)((char*)stack -> data + log_byte_capacity) =  canary_const;
+        #ifdef CANARY_PROTECTION
+            *(canary_t*)((char*)stack -> data - sizeof(canary_t))       =  canary_const;
+            *(canary_t*)((char*)stack -> data + aligned_byte_capacity) =  canary_const;
         #endif
     }
     else
         stack -> data = NULL;
 
-    #ifdef CANARY_PROTECT
+    #ifdef CANARY_PROTECTION
         stack -> left_canary  =  canary_const;
         stack -> right_canary =  canary_const;
     #endif
 
-    #ifdef HASH_PROTECT
+    #ifdef HASH_PROTECTION
     stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
@@ -57,9 +52,10 @@ stack_err stack_delete(stack_t* stack)
     }
 
     if (stack -> data != NULL)
-        free(stack -> data);
+        free((char*)stack -> data ON_CANARY(- sizeof(canary_t)));
 
-    memset(stack, 0, (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t) + sizeof(canary_t));
+    memset(stack, 0, (size_t)((char*)&stack -> data - (char*)stack)
+                      ON_HASH(+ 2 * sizeof(stack-> stack_hash_sum)) ON_CANARY(+ sizeof(canary_t)));
     return OK;
 }
 
@@ -96,15 +92,24 @@ stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, co
 
     printf(ANSI_COLOR_CYAN);
     printf("stack data[%p]:\n{\n", stack -> data);
+    #ifdef CANARY_PROTECTION
     printf("left  canary [%llX] at (%p)\n",
            *(canary_t*)((char*)stack -> data - sizeof(canary_t)), (char*)stack -> data - sizeof(canary_t));
     printf("right canary [%llX] at (%p)\n",
-           *(canary_t*)((char*)stack -> data + UP_TO_EIGHT(stack -> capacity * (sizeof(stack_elem_t)))),
-           (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));
-    printf("hash         [%lld] at (%p)\n", stack -> data_hash_sum, &stack -> data_hash_sum);
+           *(canary_t*)((char*)stack -> data + UP_TO_EIGHT(stack -> capacity * (stack -> elem_size))),
+           (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * stack -> elem_size));
+    #endif
+
+    #ifdef HASH_PROTECTION
+    printf("hash         [%llX] at (%p)\n", stack -> data_hash_sum, &stack -> data_hash_sum);
+    #endif
 
     for (int i = 0; i < stack -> capacity; i++)
-        printf("%4d:[%lld][%llx]\n", i, stack -> data[i], stack -> data[i]);
+    {
+        printf("%4d:[%lld][%llx]\n", i,
+               *(uint64_t*)((char*)stack -> data + i * stack -> elem_size),
+               *(uint64_t*)((char*)stack -> data + i * stack -> elem_size));
+    }
     printf("}\n");
     printf(ANSI_COLOR_RESET);
 
@@ -141,6 +146,7 @@ stack_err stack_dump_errors(stack_t* stack)
     return OK;
 }
 
+
 uint64_t stack_verify(stack_t* stack)
 {
     if (stack == NULL)
@@ -149,21 +155,20 @@ uint64_t stack_verify(stack_t* stack)
     if (stack -> size > stack -> capacity)
         stack -> err_stat += SIZE_ERROR;
 
-    #ifdef HASH_PROTECT
-    uint64_t hash = 0;
+    #ifdef HASH_PROTECTION
     if (stack -> stack_hash_sum != calc_hash((char*)stack, (char*)&stack -> stack_hash_sum))
     {
         stack -> err_stat = stack -> err_stat | STACK_HASH_ERROR;
         return stack -> err_stat;
     }
-    if (stack -> data_hash_sum != calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t))))
+    if (stack -> data_hash_sum != calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * stack -> elem_size)))
     {
         stack -> err_stat = stack -> err_stat | DATA_HASH_ERROR;
         return stack -> err_stat;
     }
     #endif
 
-    #ifdef CANARY_PROTECT
+    #ifdef CANARY_PROTECTION
     //CHECKING STACK CANARIES-----------------------------------------------------------------------------------------------------------------
     canary_t canary_value = (canary_t)canary_const;
     if (memcmp(&stack -> left_canary, &canary_value, sizeof(canary_t)) != 0)
@@ -182,11 +187,12 @@ uint64_t stack_verify(stack_t* stack)
     }
 
     canary_t data_canary_value = canary_const;
-    size_t log_byte_capacity = UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t));
+    size_t aligned_byte_capacity = UP_TO_EIGHT(stack -> capacity * stack -> elem_size);
+
     if (memcmp((char*)stack -> data - sizeof(canary_t), &data_canary_value, sizeof(canary_t)) != 0)
         stack -> err_stat = stack -> err_stat | LEFT_DATA_CANARY_DIED;
 
-    if (memcmp((char*)stack -> data + log_byte_capacity, &data_canary_value, sizeof(canary_t)) != 0)
+    if (memcmp((char*)stack -> data + aligned_byte_capacity, &data_canary_value, sizeof(canary_t)) != 0)
         stack -> err_stat = stack -> err_stat | RIGHT_DATA_CANARY_DIED;
     #endif
 
@@ -214,45 +220,56 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
 {
     if (stack_verify(stack) != OK)
     {
-        STACK_DUMP(stack, __func__);
-        stack_dump_errors(stack);
+        //STACK_DUMP(stack, __func__);
+        //stack_dump_errors(stack);
+        printf("ERROR in stack_realloc\n");
         return OK;
     }
+
     if (stack -> capacity == 0)
-        return stack_init(stack, default_stack_size);
+        return stack_init(stack, default_stack_size, stack -> elem_size);
 
     size_t new_capacity = 0;
+    size_t realloc_capacity = 0;
     if (state == INCREASE)
-        new_capacity      = stack -> capacity * realloc_coeff;
+    {
+        new_capacity     = stack -> capacity * realloc_coeff;
+        realloc_capacity = stack -> capacity * realloc_coeff;
+    }
     else
-        new_capacity = stack -> capacity / (realloc_coeff * realloc_coeff);
+    {
+        new_capacity     = stack -> capacity / (realloc_coeff * realloc_coeff);
+        realloc_capacity = stack -> capacity / realloc_coeff;
+    }
 
-    size_t log_byte_capacity = UP_TO_EIGHT(new_capacity * sizeof(stack_elem_t));
+    size_t aligned_byte_capacity = UP_TO_EIGHT(realloc_capacity * stack -> elem_size);
 
-    char* ptr = (char*)realloc((char*)stack -> data - sizeof(canary_t), log_byte_capacity + 2 * sizeof(canary_t));
+    char* ptr = (char*)realloc((char*)stack -> data ON_CANARY(- sizeof(canary_t)),
+                               aligned_byte_capacity ON_CANARY(+ 2 * sizeof(canary_t)));
     if (ptr == NULL)
     {
         FPRINTF_RED(stderr, "Cannot reallocate memory for stack\n");
         stack -> err_stat = ALLOC_ERROR;
-        #ifdef HASH_PROTECT
+        #ifdef HASH_PROTECTION
             stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
         #endif
         return ALLOC_ERROR;
     }
 
-    if (state == INCREASE)
-        memset(ptr + sizeof(canary_t) + stack -> capacity * sizeof(stack_elem_t), 0, (new_capacity - stack -> capacity) * sizeof(stack_elem_t));
-
-    stack -> data  = (stack_elem_t*)(ptr + sizeof(canary_t));
     stack -> capacity = new_capacity;
+    if (state == INCREASE)
+        memset(ptr ON_CANARY(+ sizeof(canary_t)) + (new_capacity / 2) * stack -> elem_size, 0,
+               (new_capacity / 2) * stack -> elem_size);
 
-    #ifdef CANARY_PROTECT
-        *(canary_t*)((char*)stack -> data - sizeof(canary_t))  =  canary_const;
-        *(canary_t*)((char*)stack -> data + log_byte_capacity) =  canary_const;
+    stack -> data = ptr ON_CANARY(+ sizeof(canary_t));
+
+    #ifdef CANARY_PROTECTION
+        *(canary_t*)((char*)stack -> data - sizeof(canary_t))      =  canary_const;
+        *(canary_t*)((char*)stack -> data + aligned_byte_capacity) =  canary_const;
     #endif
 
-    #ifdef HASH_PROTECT
-        stack -> data_hash_sum  = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));
+    #ifdef HASH_PROTECTION
+        stack -> data_hash_sum  = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * stack -> elem_size));
         stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
@@ -263,8 +280,9 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
 {
     if (stack_verify(stack) != OK)
     {
-        STACK_DUMP(stack, __func__);
-        stack_dump_errors(stack);
+        //STACK_DUMP(stack, __func__);
+        //stack_dump_errors(stack);
+        printf("PUSH ERROR\n");
         return OK;
     }
 
@@ -272,54 +290,60 @@ stack_err stack_push(stack_t* stack, stack_elem_t elem)
     {
         stack_realloc(stack, INCREASE);
 
-        #ifdef HASH_PROTECT
-            stack -> data_hash_sum  = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));
+        #ifdef HASH_PROTECTION
+            stack -> data_hash_sum  = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * stack -> elem_size));
             stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
         #endif
     }
 
-    stack -> data[stack -> size] = elem;
+    memcpy((char*)stack -> data + stack -> size * stack -> elem_size, &elem, stack -> elem_size);
+    //stack -> data[stack -> size] = elem;
     (stack -> size)++;
 
-    #ifdef HASH_PROTECT
-        stack -> data_hash_sum  = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));
+    #ifdef HASH_PROTECTION
+        stack -> data_hash_sum  = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * stack -> elem_size));
         stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
     return OK;
 }
 
-stack_err stack_pop(stack_t* stack)
+stack_err stack_pop(stack_t* stack, void* temp)
 {
     if (stack_verify(stack) != OK)
     {
-        STACK_DUMP(stack, __func__);
-        stack_dump_errors(stack);
+        // STACK_DUMP(stack, __func__);
+        // stack_dump_errors(stack);
+        printf("ERROR in stack_pop\n");
         return OK;
+    }
+
+    if (temp == NULL)
+    {
+        FPRINTF_RED(stderr, "INVALID POINTER(NULL) given to stack_pop\n");
+        return PTR_ERROR;
     }
     if (stack -> size > 0)
     {
-        *(stack -> data + stack -> size - 1) = 0;
+        memcpy(temp, (char*)stack -> data + (stack -> size - 1) * stack -> elem_size,  stack -> elem_size);
+        memset((char*)stack -> data + (stack -> size - 1) * stack -> elem_size, 0, stack -> elem_size);
         stack -> size--;
     }
     else
     {
-        printf("--------------------SIZE ERROR--------------------------\n");
         stack -> err_stat = SIZE_ERROR;
-        #ifdef HASH_PROTECT
+        #ifdef HASH_PROTECTION
         stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
         #endif
         return SIZE_ERROR;
     }
-    #ifdef HASH_PROTECT
-        stack -> data_hash_sum  = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));
+    #ifdef HASH_PROTECTION
+        stack -> data_hash_sum  = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * stack -> elem_size));
         stack -> stack_hash_sum = calc_hash((char*)stack, (char*)&stack -> stack_hash_sum);
     #endif
 
     if (stack -> size <= stack -> capacity / (realloc_coeff * realloc_coeff))
-    {
-        PRINTF_RED("REALLOC CALLED FROM stack_pop\n");
         stack_realloc(stack, DECREASE);
-    }
+
     return OK;
 }

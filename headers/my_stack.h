@@ -21,6 +21,18 @@
 
 #endif
 
+#ifdef CANARY_PROTECTION
+
+#define ON_CANARY(...) __VA_ARGS__
+
+#endif
+
+#ifdef HASH_PROTECTION
+
+#define ON_HASH(...) __VA_ARGS__
+
+#endif
+
 #define INIT(var) 0, #var, __FILE__, __LINE__
 #define canary_const 0xD15EA5E
 
@@ -64,7 +76,7 @@ typedef uint64_t stack_elem_t;
 typedef uint64_t canary_t;
 
 struct stack_t {
-    #ifdef CANARY_PROTECT
+    #ifdef CANARY_PROTECTION
     uint64_t left_canary;
     #endif
 
@@ -76,15 +88,16 @@ struct stack_t {
 
     size_t size;
     size_t capacity;
+    size_t elem_size;
     uint64_t err_stat;
-    stack_elem_t* data;
+    void* data;
 
-    #ifdef HASH_PROTECT
+    #ifdef HASH_PROTECTION
     uint64_t data_hash_sum;
     uint64_t stack_hash_sum;
     #endif
 
-    #ifdef CANARY_PROTECT
+    #ifdef CANARY_PROTECTION
     uint64_t right_canary;
     #endif
 };
@@ -93,7 +106,7 @@ struct stack_t {
 
 #define STACK_DUMP(stack, func) stack_dump(stack, __FILE__, __LINE__, func)
 
-stack_err stack_init   (stack_t* stack, int init_size);
+stack_err stack_init   (stack_t* stack, size_t init_size, size_t elem_size);
 stack_err stack_delete (stack_t* stack);
 
 stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, const char* call_func);
@@ -105,6 +118,6 @@ uint64_t calc_hash(char* start, char* end);
 stack_err stack_realloc(stack_t* stack, stack_realloc_state state);
 
 stack_err stack_push(stack_t* stack, stack_elem_t elem);
-stack_err stack_pop (stack_t* stack);
+stack_err stack_pop (stack_t* stack, void* temp);
 
 #endif //_STACK_HEADER_H__
