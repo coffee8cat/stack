@@ -57,13 +57,9 @@ stack_err stack_delete(stack_t* stack)
     }
 
     if (stack -> data != NULL)
-    {
-        memset(stack -> data, 0, UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)) + 2 * sizeof(canary_t));
         free(stack -> data);
-    }
-    memset(stack, 0, (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t) + sizeof(canary_t));
 
-    printf("got here\n\n\n");
+    memset(stack, 0, (size_t)(&stack -> right_canary - &stack -> left_canary) * sizeof(stack_elem_t) + sizeof(canary_t));
     return OK;
 }
 
@@ -77,11 +73,11 @@ stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, co
     printf(ANSI_COLOR_BLUE);
     printf("stack[%p] created in %s:%ld\n", stack, stack -> file, stack -> line);
     printf("name [%s], called from %s:%d (%s)\n",  stack -> name, call_file, call_line, call_func);
-    printf("left canary  [%lX] at (%p)\n",  stack -> left_canary,  &stack -> left_canary);
-    printf("right canary [%lX] at (%p)\n",  stack -> right_canary, &stack -> right_canary);
-    printf("hash         [%ld] at (%p)\n", stack -> stack_hash_sum, &stack -> stack_hash_sum);
-    printf("size:        [%d]\n", stack -> size);
-    printf("capacity:    [%d]\n", stack -> capacity);
+    printf("left canary  [%llX] at (%p)\n",  stack -> left_canary,  &stack -> left_canary);
+    printf("right canary [%llX] at (%p)\n",  stack -> right_canary, &stack -> right_canary);
+    printf("hash         [%llX] at (%p)\n", stack -> stack_hash_sum, &stack -> stack_hash_sum);
+    printf("size:        [%ld]\n", stack -> size);
+    printf("capacity:    [%ld]\n", stack -> capacity);
     printf(ANSI_COLOR_RESET);
 
     if (stack -> data == NULL)
@@ -100,12 +96,12 @@ stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, co
 
     printf(ANSI_COLOR_CYAN);
     printf("stack data[%p]:\n{\n", stack -> data);
-    printf("left  canary [%lX] at (%p)\n",
+    printf("left  canary [%llX] at (%p)\n",
            *(canary_t*)((char*)stack -> data - sizeof(canary_t)), (char*)stack -> data - sizeof(canary_t));
-    printf("right canary [%lX] at (%p)\n",
+    printf("right canary [%llX] at (%p)\n",
            *(canary_t*)((char*)stack -> data + UP_TO_EIGHT(stack -> capacity * (sizeof(stack_elem_t)))),
            (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));
-    printf("hash         [%ld] at (%p)\n", stack -> data_hash_sum, &stack -> data_hash_sum);
+    printf("hash         [%lld] at (%p)\n", stack -> data_hash_sum, &stack -> data_hash_sum);
 
     for (int i = 0; i < stack -> capacity; i++)
         printf("%4d:[%lld][%llx]\n", i, stack -> data[i], stack -> data[i]);
@@ -153,6 +149,20 @@ uint64_t stack_verify(stack_t* stack)
     if (stack -> size > stack -> capacity)
         stack -> err_stat += SIZE_ERROR;
 
+    #ifdef HASH_PROTECT
+    uint64_t hash = 0;
+    if (stack -> stack_hash_sum != calc_hash((char*)stack, (char*)&stack -> stack_hash_sum))
+    {
+        stack -> err_stat = stack -> err_stat | STACK_HASH_ERROR;
+        return stack -> err_stat;
+    }
+    if (stack -> data_hash_sum != calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t))))
+    {
+        stack -> err_stat = stack -> err_stat | DATA_HASH_ERROR;
+        return stack -> err_stat;
+    }
+    #endif
+
     #ifdef CANARY_PROTECT
     //CHECKING STACK CANARIES-----------------------------------------------------------------------------------------------------------------
     canary_t canary_value = (canary_t)canary_const;
@@ -178,14 +188,6 @@ uint64_t stack_verify(stack_t* stack)
 
     if (memcmp((char*)stack -> data + log_byte_capacity, &data_canary_value, sizeof(canary_t)) != 0)
         stack -> err_stat = stack -> err_stat | RIGHT_DATA_CANARY_DIED;
-    #endif
-
-    #ifdef HASH_PROTECT
-    uint64_t hash = 0;
-    if (stack -> stack_hash_sum != calc_hash((char*)stack, (char*)&stack -> stack_hash_sum))
-        stack -> err_stat = stack -> err_stat | STACK_HASH_ERROR;
-    if (stack -> data_hash_sum != calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t))))
-        stack -> err_stat = stack -> err_stat | DATA_HASH_ERROR;
     #endif
 
     return stack -> err_stat;
@@ -217,7 +219,7 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
         return OK;
     }
     if (stack -> capacity == 0)
-        return stack_init(stack, default_stack_size);;
+        return stack_init(stack, default_stack_size);
 
     size_t new_capacity = 0;
     if (state == INCREASE)
@@ -237,19 +239,17 @@ stack_err stack_realloc(stack_t* stack, stack_realloc_state state)
         #endif
         return ALLOC_ERROR;
     }
-    else // wtf
-    {
-        if (state == INCREASE)
-            memset(ptr + sizeof(canary_t) + stack -> capacity * sizeof(stack_elem_t), 0, (new_capacity - stack -> capacity) * sizeof(stack_elem_t));
 
-        stack -> data  = (stack_elem_t*)(ptr + sizeof(canary_t));
-        stack -> capacity = new_capacity;
+    if (state == INCREASE)
+        memset(ptr + sizeof(canary_t) + stack -> capacity * sizeof(stack_elem_t), 0, (new_capacity - stack -> capacity) * sizeof(stack_elem_t));
 
-        #ifdef CANARY_PROTECT
-            *(canary_t*)((char*)stack -> data - sizeof(canary_t))  =  canary_const;
-            *(canary_t*)((char*)stack -> data + log_byte_capacity) =  canary_const;
-        #endif
-    }
+    stack -> data  = (stack_elem_t*)(ptr + sizeof(canary_t));
+    stack -> capacity = new_capacity;
+
+    #ifdef CANARY_PROTECT
+        *(canary_t*)((char*)stack -> data - sizeof(canary_t))  =  canary_const;
+        *(canary_t*)((char*)stack -> data + log_byte_capacity) =  canary_const;
+    #endif
 
     #ifdef HASH_PROTECT
         stack -> data_hash_sum  = calc_hash((char*)stack -> data, (char*)stack -> data + UP_TO_EIGHT(stack -> capacity * sizeof(stack_elem_t)));

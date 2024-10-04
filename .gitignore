@@ -1,3 +1,9 @@
 
 *.o
 *.exe
+*.exe
+obj/my_stack.o
+obj/main.o
+*.exe
+*.o
+*.log
