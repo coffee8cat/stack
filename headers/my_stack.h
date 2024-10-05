@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <assert.h>
 
 #include "stack_config.h"
 
-#define DEBUG
 #ifdef DEBUG
 
 #define DEBUG_PRINTF(...) printf(__VA_ARGS__)
@@ -56,7 +56,7 @@
 
 enum stack_realloc_state {INCREASE, DECREASE};
 const size_t realloc_coeff = 2;
-const uint64_t hash_coeff = 1;
+const uint64_t hash_coeff = 33;
 const size_t default_stack_size = 8;
 
 enum stack_err {
@@ -104,15 +104,15 @@ struct stack_t {
 
 #define UP_TO_EIGHT(x) (x) + (8 - (x) % 8) % 8
 
-#define STACK_DUMP(stack, func) stack_dump(stack, __FILE__, __LINE__, func)
+#define STACK_DUMP(stack, func) stack_dump(stack, __FILE__, __LINE__, func, &dump_char)
 
 stack_err stack_init   (stack_t* stack, size_t init_size, size_t elem_size);
 stack_err stack_delete (stack_t* stack);
 
-stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, const char* call_func);
+stack_err stack_dump(stack_t* stack, const char* call_file, size_t call_line, const char* call_func, int (* dump_func)(size_t, stack_t*));
 stack_err stack_dump_errors(stack_t* stack);
-uint64_t stack_verify(stack_t* stack);
 
+uint64_t stack_verify(stack_t* stack);
 static uint64_t calc_hash(char* start, char* end);
 
 static stack_err stack_realloc(stack_t* stack, stack_realloc_state state);
@@ -120,4 +120,27 @@ static stack_err stack_realloc(stack_t* stack, stack_realloc_state state);
 stack_err stack_push(stack_t* stack, stack_elem_t elem);
 stack_err stack_pop (stack_t* stack, void* temp);
 
+static int dump_char(size_t i, stack_t* stack)
+{
+    char temp = *((char*)stack -> data + i * stack -> elem_size);
+    return printf("%4d:[%c](%d)\n", i, temp, temp);
+}
+static int dump_int(size_t i, stack_t* stack)
+{
+    int temp = 0;
+    memcpy(&temp, (char*)stack -> data + i * stack -> elem_size, stack -> elem_size);
+    return printf("%4d:[%d]\n", i, temp);
+}
+static int dump_double(size_t i, stack_t* stack)
+{
+    double temp = 0;
+    memcpy(&temp, (char*)stack -> data + i * stack -> elem_size, stack -> elem_size);
+    return printf("%4d:[%lf]\n", i, temp);
+}
+static int dump_uint64_t(size_t i, stack_t* stack)
+{
+    uint64_t temp = 0;
+    memcpy(&temp, (char*)stack -> data + i * stack -> elem_size, stack -> elem_size);
+    return printf("%4d:[%llX]\n", i, temp);
+}
 #endif //_STACK_HEADER_H__

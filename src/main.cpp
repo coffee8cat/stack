@@ -4,17 +4,16 @@
 int main()
 {
     stack_t stack = {INIT(stack)};
-    stack_init(&stack, 8, 8);
-    STACK_DUMP(&stack, __func__);
+    stack_init(&stack, 13, 1);
     for (size_t i = 0; i < 20; i++)
         stack_push(&stack, i * 10);
 
-    STACK_DUMP(&stack, __func__);
+    stack_dump(&stack, __FILE__, __LINE__, __func__, &dump_char); dump(stack, dump_har);
     uint64_t temp = 0;
     for (size_t i = 0; i < 20; i++)
     {
         stack_pop(&stack, &temp);
-        printf("temp = [%lld]\n", temp);
+        printf("temp = [%c](%d)\n", temp, temp);
     }
     stack_delete(&stack);
     return 0;
